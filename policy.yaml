@@ -1,0 +1,295 @@
+# AI Agent Safety & Governance Policy Configuration
+# This file defines safety rules, confidence thresholds, and automation policies
+
+global:
+  auto_mode: true
+  default_confidence_threshold: 0.85
+  rate_limit:
+    per_action: 50     # max 50 executions per action type
+    per_window_sec: 60  # within 1 minute
+  circuit_breaker:
+    failure_threshold: 5  # open circuit after 5 failures
+    cooldown_seconds: 300  # 5 minutes cooldown
+  audit:
+    retention_days: 30
+    log_level: "INFO"
+
+actions:
+  # QoS Anomaly Actions
+  bandwidth_reallocation:
+    autofix: true
+    confidence_threshold: 0.8
+    canary: true
+    canary_params:
+      bandwidth_percentage: 0.1  # Start with 10% reallocation
+      hold_seconds: 30
+      validation_metric: "qos_compliance"
+  
+  load_balancing:
+    autofix: true
+    confidence_threshold: 0.75
+    canary: true
+    canary_params:
+      sample_pct: 5  # Test on 5% of traffic
+      hold_seconds: 20
+      validation_metric: "latency"
+  
+  qos_upgrade:
+    autofix: true
+    confidence_threshold: 0.85
+    canary: false  # QoS upgrades are generally safe
+  
+  # Failure Prediction Actions
+  restart_upf:
+    autofix: true
+    confidence_threshold: 0.9
+    canary: false
+    maintenance_window: true
+  
+  scale_upf:
+    autofix: true
+    confidence_threshold: 0.85
+    canary: true
+    canary_params:
+      replicas_step: 1
+      hold_seconds: 30
+      validation_metric: "cpu_utilization"
+  
+  # Energy Optimization Actions
+  sleep_mode:
+    autofix: true
+    confidence_threshold: 0.8
+    canary: true
+    canary_params:
+      duration_minutes: 5
+      hold_seconds: 60
+      validation_metric: "energy_savings"
+  
+  power_adjustment:
+    autofix: true
+    confidence_threshold: 0.75
+    canary: true
+    canary_params:
+      power_step_db: 1
+      hold_seconds: 45
+      validation_metric: "signal_quality"
+  
+  # Security Actions
+  block_suspicious_ue:
+    autofix: true
+    confidence_threshold: 0.95
+    canary: false
+    immediate_action: true
+  
+  rate_limit_ue:
+    autofix: true
+    confidence_threshold: 0.8
+    canary: true
+    canary_params:
+      limit_percentage: 0.5
+      hold_seconds: 15
+      validation_metric: "attack_mitigation"
+  
+  # Traffic Management Actions
+  reroute_slice:
+    autofix: true
+    confidence_threshold: 0.8
+    canary: true
+    canary_params:
+      sample_pct: 10
+      hold_seconds: 20
+      validation_metric: "throughput"
+  
+  capacity_scaling:
+    autofix: true
+    confidence_threshold: 0.85
+    canary: true
+    canary_params:
+      scale_factor: 1.2
+      hold_seconds: 60
+      validation_metric: "capacity_utilization"
+  
+  # User Experience Actions
+  ux_analysis:
+    autofix: true
+    confidence_threshold: 0.7
+    canary: false
+    monitoring_only: true  # Analysis only, no network changes
+  
+  qoe_improvement:
+    autofix: true
+    confidence_threshold: 0.8
+    canary: true
+    canary_params:
+      sample_pct: 5
+      hold_seconds: 30
+      validation_metric: "mos_score"
+  
+  # Policy Optimization Actions
+  policy_optimization:
+    autofix: true
+    confidence_threshold: 0.75
+    canary: true
+    canary_params:
+      parameter_step: 0.1
+      hold_seconds: 45
+      validation_metric: "network_performance"
+  
+  parameter_tuning:
+    autofix: true
+    confidence_threshold: 0.8
+    canary: true
+    canary_params:
+      tuning_factor: 0.05
+      hold_seconds: 60
+      validation_metric: "qos_compliance"
+  
+  # Data Quality Actions
+  data_quality_issue:
+    autofix: true
+    confidence_threshold: 0.9
+    canary: false
+    monitoring_only: true  # Alert only, no automatic fixes
+  
+  data_validation:
+    autofix: true
+    confidence_threshold: 0.85
+    canary: false
+    immediate_action: true
+  
+  # Additional Agent Actions
+  qos_anomaly_detected:
+    autofix: true
+    confidence_threshold: 0.8
+    canary: true
+    canary_params:
+      sample_pct: 10
+      hold_seconds: 20
+      validation_metric: "qos_compliance"
+  
+  failure_prediction:
+    autofix: true
+    confidence_threshold: 0.85
+    canary: false
+    monitoring_only: true
+  
+  traffic_forecast:
+    autofix: true
+    confidence_threshold: 0.7
+    canary: false
+    monitoring_only: true
+  
+  security_threat_detected:
+    autofix: true
+    confidence_threshold: 0.95
+    canary: false
+    immediate_action: true
+
+# Blackout windows for maintenance
+blackout_windows:
+  - name: "weekend_maintenance"
+    weekdays: [6, 7]  # Saturday & Sunday
+    start: "02:00"
+    end: "05:00"
+    actions_blocked: ["restart_upf", "scale_upf"]
+  
+  - name: "business_hours"
+    weekdays: [1, 2, 3, 4, 5]  # Monday to Friday
+    start: "09:00"
+    end: "17:00"
+    actions_blocked: ["sleep_mode", "power_adjustment"]
+
+# Cost limits for automated actions
+cost_limits:
+  bandwidth_reallocation:
+    max_cost_per_hour: 100  # USD
+    max_daily_cost: 1000
+  
+  capacity_scaling:
+    max_cost_per_hour: 500
+    max_daily_cost: 5000
+  
+  power_adjustment:
+    max_cost_per_hour: 50
+    max_daily_cost: 500
+
+# Validation metrics and thresholds
+validation_metrics:
+  qos_compliance:
+    threshold: 0.95  # Must maintain 95% QoS compliance
+    measurement_window: 300  # 5 minutes
+  
+  latency:
+    threshold: 100  # ms
+    measurement_window: 60
+  
+  cpu_utilization:
+    threshold: 0.8  # 80%
+    measurement_window: 120
+  
+  energy_savings:
+    threshold: 0.1  # 10% savings
+    measurement_window: 300
+  
+  signal_quality:
+    threshold: -90  # dBm
+    measurement_window: 60
+  
+  attack_mitigation:
+    threshold: 0.8  # 80% attack reduction
+    measurement_window: 30
+  
+  throughput:
+    threshold: 0.9  # 90% of baseline
+    measurement_window: 60
+  
+  capacity_utilization:
+    threshold: 0.7  # 70% utilization
+    measurement_window: 120
+  
+  mos_score:
+    threshold: 3.5  # Mean Opinion Score
+    measurement_window: 60
+  
+  network_performance:
+    threshold: 0.85  # 85% performance improvement
+    measurement_window: 120
+
+# Operator override settings
+operator_controls:
+  emergency_stop: true
+  manual_approval_required: false
+  notification_channels: ["email", "slack", "sms"]
+  escalation_timeout: 300  # 5 minutes
+
+# Rollback policies
+rollback:
+  automatic_rollback: true
+  rollback_timeout: 300  # 5 minutes
+  rollback_triggers:
+    - "validation_metric_below_threshold"
+    - "error_rate_above_threshold"
+    - "operator_override"
+  
+  rollback_actions:
+    bandwidth_reallocation: "restore_original_allocation"
+    load_balancing: "disable_load_balancing"
+    qos_upgrade: "revert_qos_class"
+    restart_upf: "restart_backup_upf"
+    scale_upf: "scale_to_previous_replicas"
+    sleep_mode: "wake_up_cell"
+    power_adjustment: "restore_original_power"
+    block_suspicious_ue: "unblock_ue"
+    rate_limit_ue: "remove_rate_limit"
+    reroute_slice: "restore_original_routing"
+    capacity_scaling: "scale_to_original_capacity"
+    ux_analysis: "disable_ux_monitoring"
+    qoe_improvement: "revert_qoe_settings"
+    policy_optimization: "restore_original_policy"
+    parameter_tuning: "restore_original_parameters"
+    data_quality_issue: "disable_quality_monitoring"
+    data_validation: "restore_original_validation"
+    qos_anomaly_detected: "disable_anomaly_detection"
+    failure_prediction: "disable_failure_monitoring"
+    traffic_forecast: "disable_traffic_monitoring"
+    security_threat_detected: "disable_security_monitoring"

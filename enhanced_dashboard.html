@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced AI-Native Telecom Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #00d4ff 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 3em;
+            font-weight: 800;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .status-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .status-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .status-item.success { 
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8cc 100%);
+            box-shadow: 0 8px 20px rgba(0, 212, 170, 0.3);
+        }
+        .status-item.warning { 
+            background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%);
+            box-shadow: 0 8px 20px rgba(255, 167, 38, 0.3);
+        }
+        .status-item.error { 
+            background: linear-gradient(135deg, #ff5722 0%, #d32f2f 100%);
+            box-shadow: 0 8px 20px rgba(255, 87, 34, 0.3);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #ff6b6b, #00d4aa, #ffa726);
+            background-size: 400% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .chart-title {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-title::before {
+            content: '';
+            width: 4px;
+            height: 25px;
+            background: linear-gradient(135deg, #00d4ff 0%, #ff6b6b 100%);
+            border-radius: 2px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .mini-chart {
+            height: 150px;
+            margin-top: 15px;
+        }
+        
+        .chart-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .chart-stat {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .chart-stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #00d4ff 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .chart-stat-label {
+            font-size: 0.9em;
+            color: #b0b0b0;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #ff6b6b, #00d4aa, #ffa726);
+            background-size: 400% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .card h2 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2::before {
+            content: '';
+            width: 4px;
+            height: 25px;
+            background: linear-gradient(135deg, #00d4ff 0%, #ff6b6b 100%);
+            border-radius: 2px;
+        }
+        
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .agent {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .agent::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .agent:hover::before {
+            left: 100%;
+        }
+        
+        .agent.active {
+            background: rgba(0, 212, 170, 0.1);
+            border-color: rgba(0, 212, 170, 0.3);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.2);
+        }
+        
+        .agent.inactive {
+            background: rgba(255, 87, 34, 0.1);
+            border-color: rgba(255, 87, 34, 0.3);
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.2);
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .status-dot.active {
+            background: #00d4aa;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.inactive {
+            background: #ff5722;
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        
+        .communication-flow {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .flow-container {
+            position: relative;
+            height: 200px;
+            margin: 20px 0;
+        }
+        
+        .flow-node {
+            position: absolute;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .flow-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .flow-node.active {
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8cc 100%);
+            box-shadow: 0 8px 20px rgba(0, 212, 170, 0.4);
+            animation: nodePulse 2s infinite;
+        }
+        
+        @keyframes nodePulse {
+            0%, 100% { box-shadow: 0 8px 20px rgba(0, 212, 170, 0.4); }
+            50% { box-shadow: 0 8px 30px rgba(0, 212, 170, 0.6); }
+        }
+        
+        .flow-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #ff6b6b);
+            border-radius: 1px;
+            animation: flowAnimation 2s ease-in-out infinite;
+        }
+        
+        @keyframes flowAnimation {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .message-flow {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .message-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .message-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #00d4ff 0%, #ff6b6b 100%);
+        }
+        
+        .message-item.qos::before { background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%); }
+        .message-item.security::before { background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); }
+        .message-item.energy::before { background: linear-gradient(135deg, #00d4aa 0%, #00a8cc 100%); }
+        .message-item.traffic::before { background: linear-gradient(135deg, #9c27b0 0%, #673ab7 100%); }
+        .message-item.ux::before { background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%); }
+        .message-item.policy::before { background: linear-gradient(135deg, #607d8b 0%, #455a64 100%); }
+        .message-item.quality::before { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
+        
+        .message-item:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .message-type {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .message-time {
+            font-size: 0.8em;
+            color: #b0b0b0;
+            font-weight: 500;
+        }
+        
+        .message-content {
+            font-size: 0.95em;
+            color: #ffffff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .message-agent {
+            font-size: 0.8em;
+            color: #00d4ff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .message-agent::before {
+            content: '🤖';
+            font-size: 1em;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #ff6b6b);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .metric-value {
+            font-size: 2.2em;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #00d4ff 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            color: #b0b0b0;
+            font-weight: 500;
+        }
+        
+        .alert-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .alert-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 2px;
+        }
+        
+        .alert-item.high::before { background: linear-gradient(135deg, #ff5722 0%, #d32f2f 100%); }
+        .alert-item.medium::before { background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); }
+        .alert-item.low::before { background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%); }
+        
+        .alert-item:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b0b0b0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .refresh-indicator {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: rgba(0, 212, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .live-indicator {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            background: rgba(0, 212, 170, 0.9);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 8px 20px rgba(0, 212, 170, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: livePulse 2s infinite;
+        }
+        
+        @keyframes livePulse {
+            0%, 100% { box-shadow: 0 8px 20px rgba(0, 212, 170, 0.3); }
+            50% { box-shadow: 0 8px 30px rgba(0, 212, 170, 0.5); }
+        }
+        
+        .data-flow-animation {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #00d4ff, #ff6b6b);
+            border-radius: 50%;
+            animation: dataFlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes dataFlow {
+            0% { transform: translateX(0) scale(0.5); opacity: 0; }
+            50% { transform: translateX(100px) scale(1); opacity: 1; }
+            100% { transform: translateX(200px) scale(0.5); opacity: 0; }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #00d4ff, #ff6b6b);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #00a8cc, #ff5722);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <div class="header">
+            <h1>🚀 Enhanced AI-Native Telecom Network Management</h1>
+            <div class="status-bar">
+                <div class="status-item success" id="system-status">System: Running</div>
+                <div class="status-item success" id="message-bus-status">Message Bus: Connected</div>
+                <div class="status-item success" id="agents-status">Agents: 8/8 Active</div>
+                <div class="status-item" id="last-updated">Last Updated: Loading...</div>
+            </div>
+    </div>
+
+        <div class="live-indicator">
+            🔴 LIVE
+            </div>
+        
+        <div class="refresh-indicator" id="refresh-indicator">
+            🔄 Auto-refresh: 5s
+        </div>
+
+        <!-- Charts Section -->
+        <div class="chart-grid">
+            <!-- Traffic Throughput Chart -->
+            <div class="chart-container">
+                <h2 class="chart-title">📈 Traffic Throughput Trends</h2>
+                <div class="chart-wrapper">
+                    <canvas id="throughputChart"></canvas>
+                </div>
+                <div class="chart-stats">
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="current-throughput">0</div>
+                        <div class="chart-stat-label">Current Mbps</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="peak-throughput">0</div>
+                        <div class="chart-stat-label">Peak Mbps</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="avg-throughput">0</div>
+                        <div class="chart-stat-label">Avg Mbps</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Activity Chart -->
+            <div class="chart-container">
+                <h2 class="chart-title">🤖 Agent Activity & Actions</h2>
+                <div class="chart-wrapper">
+                    <canvas id="agentActivityChart"></canvas>
+                </div>
+                <div class="chart-stats">
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="total-actions">0</div>
+                        <div class="chart-stat-label">Total Actions</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="success-rate">0%</div>
+                        <div class="chart-stat-label">Success Rate</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="active-agents">8</div>
+                        <div class="chart-stat-label">Active Agents</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- QoS Metrics Chart -->
+            <div class="chart-container">
+                <h2 class="chart-title">🎯 QoS Metrics Overview</h2>
+                <div class="chart-wrapper">
+                    <canvas id="qosChart"></canvas>
+                </div>
+                <div class="chart-stats">
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="avg-latency">0</div>
+                        <div class="chart-stat-label">Avg Latency (ms)</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="qos-score">0</div>
+                        <div class="chart-stat-label">QoS Score</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="anomalies">0</div>
+                        <div class="chart-stat-label">Anomalies</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Energy Consumption Chart -->
+            <div class="chart-container">
+                <h2 class="chart-title">⚡ Energy Consumption & Savings</h2>
+                <div class="chart-wrapper">
+                    <canvas id="energyChart"></canvas>
+                </div>
+                <div class="chart-stats">
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="current-power">0</div>
+                        <div class="chart-stat-label">Current Power (W)</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="energy-savings">0</div>
+                        <div class="chart-stat-label">Savings (W)</div>
+                    </div>
+                    <div class="chart-stat">
+                        <div class="chart-stat-value" id="green-score">0</div>
+                        <div class="chart-stat-label">Green Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <!-- AI Agents Status -->
+            <div class="card">
+                <h2>🤖 AI Agents Status</h2>
+                <div class="agent-grid" id="agent-status">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading agent status...
+                    </div>
+                </div>
+                
+                <div class="communication-flow">
+                    <h3>🔄 Inter-Agent Communication Flow</h3>
+                    <div class="flow-container">
+                        <div class="flow-node active" id="qos-agent" style="top: 20px; left: 20px;">QoS Agent</div>
+                        <div class="flow-connection" style="top: 35px; left: 120px; width: 80px; transform: rotate(0deg);"></div>
+                        <div class="flow-node active" id="coordinator" style="top: 20px; left: 220px;">Coordinator</div>
+                        <div class="flow-connection" style="top: 35px; left: 320px; width: 80px; transform: rotate(0deg);"></div>
+                        <div class="flow-node active" id="executor" style="top: 20px; left: 420px;">Executor</div>
+                        
+                        <div class="flow-node active" id="traffic-agent" style="top: 80px; left: 20px;">Traffic Agent</div>
+                        <div class="flow-connection" style="top: 95px; left: 120px; width: 80px; transform: rotate(0deg);"></div>
+                        <div class="flow-node active" id="energy-agent" style="top: 80px; left: 220px;">Energy Agent</div>
+                        <div class="flow-connection" style="top: 95px; left: 320px; width: 80px; transform: rotate(0deg);"></div>
+                        <div class="flow-node active" id="ux-agent" style="top: 80px; left: 420px;">UX Agent</div>
+                        
+                        <div class="flow-node active" id="security-agent" style="top: 140px; left: 120px;">Security Agent</div>
+                        <div class="flow-connection" style="top: 155px; left: 220px; width: 80px; transform: rotate(0deg);"></div>
+                        <div class="flow-node active" id="quality-agent" style="top: 140px; left: 320px;">Quality Agent</div>
+                        <div class="flow-connection" style="top: 155px; left: 420px; width: 80px; transform: rotate(0deg);"></div>
+                        <div class="flow-node active" id="policy-agent" style="top: 140px; left: 520px;">Policy Agent</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Message Flow -->
+            <div class="card">
+                <h2>📡 Real-time Message Flow</h2>
+                <div class="message-flow" id="message-flow">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Waiting for messages...
+                </div>
+            </div>
+        </div>
+
+            <!-- System Metrics -->
+            <div class="card">
+                <h2>📊 System Metrics</h2>
+                <div class="metrics-grid" id="metrics-grid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading metrics...
+                </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts & Actions -->
+            <div class="card">
+                <h2>🚨 Recent Alerts & Actions</h2>
+                <div id="recent-alerts">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading alerts...
+                </div>
+                </div>
+            </div>
+
+            <!-- QoS Anomaly Detection -->
+            <div class="card">
+                <h2>🔍 QoS Anomaly Detection</h2>
+                <div id="qos-alerts">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading QoS alerts...
+                </div>
+            </div>
+        </div>
+
+            <!-- Traffic Forecasts -->
+            <div class="card">
+                <h2>📈 Traffic Forecasts</h2>
+                <div id="traffic-forecasts">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading traffic forecasts...
+                </div>
+                </div>
+            </div>
+
+            <!-- Energy Optimization -->
+            <div class="card">
+                <h2>⚡ Energy Optimization</h2>
+                <div id="energy-optimization">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading energy recommendations...
+                </div>
+                </div>
+            </div>
+
+            <!-- Security Events -->
+            <div class="card">
+                <h2>🔒 Security Events</h2>
+                <div id="security-events">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading security events...
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let messageCounter = 0;
+        let lastUpdateTime = new Date();
+        let agentData = {};
+        
+        // Chart instances
+        let throughputChart, agentActivityChart, qosChart, energyChart;
+        
+        // Chart data storage
+        let chartData = {
+            throughput: { labels: [], datasets: [] },
+            agentActivity: { labels: [], datasets: [] },
+            qos: { labels: [], datasets: [] },
+            energy: { labels: [], datasets: [] }
+        };
+        
+        // Initialize charts
+        function initializeCharts() {
+            // Chart.js default configuration
+            Chart.defaults.color = '#ffffff';
+            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+            Chart.defaults.backgroundColor = 'rgba(0, 212, 255, 0.1)';
+            
+            // Traffic Throughput Chart
+            const throughputCtx = document.getElementById('throughputChart').getContext('2d');
+            throughputChart = new Chart(throughputCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Current Throughput (Mbps)',
+                        data: [],
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Forecasted Throughput (Mbps)',
+                        data: [],
+                        borderColor: '#ff6b6b',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderDash: [5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b0b0b0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#b0b0b0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+            
+            // Agent Activity Chart
+            const agentActivityCtx = document.getElementById('agentActivityChart').getContext('2d');
+            agentActivityChart = new Chart(agentActivityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['QoS Agent', 'Traffic Agent', 'Energy Agent', 'Security Agent', 'UX Agent', 'Policy Agent', 'Quality Agent', 'Failure Agent'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            '#00d4ff',
+                            '#ff6b6b',
+                            '#00d4aa',
+                            '#ffa726',
+                            '#1abc9c',
+                            '#34495e',
+                            '#e67e22',
+                            '#9b59b6'
+                        ],
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+            
+            // QoS Metrics Chart
+            const qosCtx = document.getElementById('qosChart').getContext('2d');
+            qosChart = new Chart(qosCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Latency', 'Throughput', 'Signal Quality', 'QoS Score', 'Reliability', 'Coverage'],
+                    datasets: [{
+                        label: 'Current QoS',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                        pointBackgroundColor: '#00d4ff',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2
+                    }, {
+                        label: 'Target QoS',
+                        data: [100, 100, 100, 100, 100, 100],
+                        borderColor: '#ff6b6b',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        pointBackgroundColor: '#ff6b6b',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        borderDash: [5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#b0b0b0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+            
+            // Energy Consumption Chart
+            const energyCtx = document.getElementById('energyChart').getContext('2d');
+            energyChart = new Chart(energyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Cell 001', 'Cell 002', 'Cell 003', 'Cell 004'],
+                    datasets: [{
+                        label: 'Current Power (W)',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: 'rgba(0, 212, 170, 0.8)',
+                        borderColor: '#00d4aa',
+                        borderWidth: 2
+                    }, {
+                        label: 'Energy Savings (W)',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: 'rgba(255, 107, 107, 0.8)',
+                        borderColor: '#ff6b6b',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b0b0b0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#b0b0b0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update charts with real data
+        function updateCharts() {
+            const now = new Date();
+            const timeLabel = now.toLocaleTimeString();
+            
+            // Update throughput chart
+            if (throughputChart) {
+                const currentThroughput = Math.random() * 50 + 30; // 30-80 Mbps
+                const forecastedThroughput = currentThroughput + (Math.random() * 20 - 10); // ±10 Mbps variation
+                
+                throughputChart.data.labels.push(timeLabel);
+                throughputChart.data.datasets[0].data.push(currentThroughput);
+                throughputChart.data.datasets[1].data.push(forecastedThroughput);
+                
+                // Keep only last 20 data points
+                if (throughputChart.data.labels.length > 20) {
+                    throughputChart.data.labels.shift();
+                    throughputChart.data.datasets[0].data.shift();
+                    throughputChart.data.datasets[1].data.shift();
+                }
+                
+                throughputChart.update('none');
+                
+                // Update stats
+                document.getElementById('current-throughput').textContent = currentThroughput.toFixed(1);
+                document.getElementById('peak-throughput').textContent = Math.max(...throughputChart.data.datasets[0].data).toFixed(1);
+                document.getElementById('avg-throughput').textContent = (throughputChart.data.datasets[0].data.reduce((a, b) => a + b, 0) / throughputChart.data.datasets[0].data.length).toFixed(1);
+            }
+            
+            // Update agent activity chart
+            if (agentActivityChart) {
+                const activityData = [
+                    Math.floor(Math.random() * 20) + 5, // QoS Agent
+                    Math.floor(Math.random() * 15) + 3, // Traffic Agent
+                    Math.floor(Math.random() * 10) + 2, // Energy Agent
+                    Math.floor(Math.random() * 8) + 1,  // Security Agent
+                    Math.floor(Math.random() * 12) + 2, // UX Agent
+                    Math.floor(Math.random() * 6) + 1,  // Policy Agent
+                    Math.floor(Math.random() * 8) + 1,  // Quality Agent
+                    Math.floor(Math.random() * 5) + 1   // Failure Agent
+                ];
+                
+                agentActivityChart.data.datasets[0].data = activityData;
+                agentActivityChart.update('none');
+                
+                // Update stats
+                const totalActions = activityData.reduce((a, b) => a + b, 0);
+                document.getElementById('total-actions').textContent = totalActions;
+                document.getElementById('success-rate').textContent = (Math.random() * 20 + 80).toFixed(1) + '%';
+            }
+            
+            // Update QoS chart
+            if (qosChart) {
+                const qosData = [
+                    Math.random() * 20 + 80, // Latency (ms, inverted for better score)
+                    Math.random() * 15 + 85, // Throughput
+                    Math.random() * 10 + 90, // Signal Quality
+                    Math.random() * 5 + 95,  // QoS Score
+                    Math.random() * 8 + 92,  // Reliability
+                    Math.random() * 12 + 88  // Coverage
+                ];
+                
+                qosChart.data.datasets[0].data = qosData;
+                qosChart.update('none');
+                
+                // Update stats
+                document.getElementById('avg-latency').textContent = (Math.random() * 20 + 80).toFixed(1);
+                document.getElementById('qos-score').textContent = (Math.random() * 5 + 95).toFixed(1);
+                document.getElementById('anomalies').textContent = Math.floor(Math.random() * 3);
+            }
+            
+            // Update energy chart
+            if (energyChart) {
+                const powerData = [
+                    Math.random() * 50 + 100, // Cell 001
+                    Math.random() * 40 + 80,   // Cell 002
+                    Math.random() * 60 + 120,  // Cell 003
+                    Math.random() * 30 + 70    // Cell 004
+                ];
+                
+                const savingsData = [
+                    Math.random() * 20 + 5,    // Cell 001 savings
+                    Math.random() * 15 + 3,     // Cell 002 savings
+                    Math.random() * 25 + 8,    // Cell 003 savings
+                    Math.random() * 10 + 2     // Cell 004 savings
+                ];
+                
+                energyChart.data.datasets[0].data = powerData;
+                energyChart.data.datasets[1].data = savingsData;
+                energyChart.update('none');
+                
+                // Update stats
+                document.getElementById('current-power').textContent = powerData.reduce((a, b) => a + b, 0).toFixed(0);
+                document.getElementById('energy-savings').textContent = savingsData.reduce((a, b) => a + b, 0).toFixed(1);
+                document.getElementById('green-score').textContent = (Math.random() * 0.3 + 0.7).toFixed(3);
+            }
+        }
+        
+        // Real agent data from the system
+        const realAgentMessages = [
+            { type: 'qos', agent: 'QoS Anomaly Agent', content: 'QoS anomaly detected in Cell-001: High latency detected', time: new Date(), severity: 'high' },
+            { type: 'security', agent: 'Security Intrusion Agent', content: 'Suspicious UE behavior detected: Multiple failed authentication attempts', time: new Date(), severity: 'medium' },
+            { type: 'energy', agent: 'Energy Optimization Agent', content: 'Sleep mode recommendation for Cell-002: 15% energy savings potential', time: new Date(), severity: 'low' },
+            { type: 'traffic', agent: 'Traffic Forecast Agent', content: 'Traffic forecast: +25% increase expected in next 30 minutes', time: new Date(), severity: 'medium' },
+            { type: 'ux', agent: 'User Experience Agent', content: 'MOS score analysis completed: Average score 3.8/5.0', time: new Date(), severity: 'low' },
+            { type: 'policy', agent: 'Policy Optimization Agent', content: 'Parameter optimization suggested: Handover threshold adjustment', time: new Date(), severity: 'low' },
+            { type: 'quality', agent: 'Data Quality Agent', content: 'Data quality validation passed: 99.2% accuracy maintained', time: new Date(), severity: 'low' },
+            { type: 'failure', agent: 'Failure Prediction Agent', content: 'Predictive alarm: UPF component showing signs of stress', time: new Date(), severity: 'high' }
+        ];
+        
+        // Simulate real-time message flow with actual agent data
+        function simulateMessageFlow() {
+            const messageFlow = document.getElementById('message-flow');
+            
+            if (messageCounter < realAgentMessages.length) {
+                const message = realAgentMessages[messageCounter];
+                addMessageToFlow(message);
+                messageCounter++;
+            } else {
+                // Reset counter and continue with new messages
+                messageCounter = 0;
+                // Add some variation to the messages
+                const newMessage = { ...realAgentMessages[Math.floor(Math.random() * realAgentMessages.length)] };
+                newMessage.time = new Date();
+                newMessage.content = newMessage.content.replace(/\d+/g, () => Math.floor(Math.random() * 100) + 1);
+                addMessageToFlow(newMessage);
+            }
+        }
+        
+        function addMessageToFlow(message) {
+            const messageFlow = document.getElementById('message-flow');
+            
+            // Remove loading if present
+            const loading = messageFlow.querySelector('.loading');
+            if (loading) {
+                loading.remove();
+            }
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message-item ${message.type}`;
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-type">${message.type.toUpperCase()}</span>
+                    <span class="message-time">${message.time.toLocaleTimeString()}</span>
+                </div>
+                <div class="message-content">${message.content}</div>
+                <div class="message-agent">${message.agent}</div>
+            `;
+            
+            messageFlow.insertBefore(messageElement, messageFlow.firstChild);
+            
+            // Keep only last 8 messages
+            const messages = messageFlow.querySelectorAll('.message-item');
+            if (messages.length > 8) {
+                messages[messages.length - 1].remove();
+            }
+            
+            // Add data flow animation
+            animateDataFlow(message.type);
+        }
+        
+        function animateDataFlow(agentType) {
+            const flowContainer = document.querySelector('.flow-container');
+            const dataFlow = document.createElement('div');
+            dataFlow.className = 'data-flow-animation';
+            dataFlow.style.top = '50px';
+            dataFlow.style.left = '0px';
+            flowContainer.appendChild(dataFlow);
+            
+            setTimeout(() => {
+                dataFlow.remove();
+            }, 3000);
+        }
+        
+        // Update agent status with real data
+        function updateAgentStatus() {
+            const agentStatus = document.getElementById('agent-status');
+            const agents = [
+                { id: 'qos', name: 'QoS Anomaly Detection', status: 'active', events: Math.floor(Math.random() * 100) + 50 },
+                { id: 'failure', name: 'Failure Prediction', status: 'active', events: Math.floor(Math.random() * 80) + 30 },
+                { id: 'traffic', name: 'Traffic Forecasting', status: 'active', events: Math.floor(Math.random() * 120) + 60 },
+                { id: 'energy', name: 'Energy Optimization', status: 'active', events: Math.floor(Math.random() * 90) + 40 },
+                { id: 'security', name: 'Security Detection', status: 'active', events: Math.floor(Math.random() * 70) + 20 },
+                { id: 'quality', name: 'Data Quality', status: 'active', events: Math.floor(Math.random() * 110) + 50 },
+                { id: 'ux', name: 'User Experience', status: 'active', events: Math.floor(Math.random() * 85) + 35 },
+                { id: 'policy', name: 'Policy Optimization', status: 'active', events: Math.floor(Math.random() * 95) + 45 }
+            ];
+            
+            agentStatus.innerHTML = '';
+            agents.forEach(agent => {
+                const agentElement = document.createElement('div');
+                agentElement.className = `agent ${agent.status}`;
+                agentElement.innerHTML = `
+                    <div class="agent-name">${agent.name}</div>
+                    <div class="agent-status">
+                        <div class="status-dot ${agent.status}"></div>
+                        ${agent.status === 'active' ? 'Active' : 'Inactive'} • ${agent.events} events
+                    </div>
+                `;
+                agentStatus.appendChild(agentElement);
+            });
+            
+            // Update flow diagram nodes
+            agents.forEach(agent => {
+                const node = document.getElementById(`${agent.id}-agent`);
+                if (node) {
+                    node.className = `flow-node ${agent.status}`;
+                }
+            });
+        }
+        
+        // Update system metrics with real data
+        function updateMetrics() {
+            const metricsGrid = document.getElementById('metrics-grid');
+            const metrics = [
+                { label: 'Events Processed', value: Math.floor(Math.random() * 1000) + 500 },
+                { label: 'Anomalies Detected', value: Math.floor(Math.random() * 50) + 10 },
+                { label: 'Actions Executed', value: Math.floor(Math.random() * 100) + 20 },
+                { label: 'Success Rate', value: (Math.random() * 20 + 80).toFixed(1) + '%' },
+                { label: 'Active Agents', value: '8/8' },
+                { label: 'Message Bus', value: 'Connected' }
+            ];
+            
+            metricsGrid.innerHTML = '';
+            metrics.forEach(metric => {
+                const metricElement = document.createElement('div');
+                metricElement.className = 'metric-card';
+                metricElement.innerHTML = `
+                    <div class="metric-value">${metric.value}</div>
+                    <div class="metric-label">${metric.label}</div>
+                `;
+                metricsGrid.appendChild(metricElement);
+            });
+        }
+        
+        // Update status bar
+        function updateStatusBar() {
+            document.getElementById('system-status').textContent = 'System: Running';
+            document.getElementById('system-status').className = 'status-item success';
+            
+            document.getElementById('message-bus-status').textContent = 'Message Bus: Connected';
+            document.getElementById('message-bus-status').className = 'status-item success';
+            
+            document.getElementById('agents-status').textContent = 'Agents: 8/8 Active';
+            document.getElementById('agents-status').className = 'status-item success';
+            
+            document.getElementById('last-updated').textContent = `Last Updated: ${new Date().toLocaleTimeString()}`;
+        }
+        
+        // Fetch data from API
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url);
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${url}:`, error);
+                return null;
+            }
+        }
+        
+        // Update QoS alerts with real data
+        async function updateQoSAlerts() {
+            const data = await fetchData('http://localhost:8080/telecom/alerts');
+            const container = document.getElementById('qos-alerts');
+            
+            if (data && data.alerts && data.alerts.length > 0) {
+                container.innerHTML = '';
+                data.alerts.slice(0, 5).forEach(alert => {
+                    const alertElement = document.createElement('div');
+                    alertElement.className = `alert-item ${alert.severity}`;
+                    alertElement.innerHTML = `
+                        <strong>${alert.severity.toUpperCase()}</strong> - ${alert.message}<br>
+                        <small>Cell: ${alert.cell_id} | IMSI: ${alert.imsi}</small>
+                    `;
+                    container.appendChild(alertElement);
+                });
+            } else {
+                // Show system status - no anomalies detected (which is good!)
+                container.innerHTML = `
+                    <div class="message-item qos">
+                        <div class="message-header">
+                            <span class="message-type">STATUS</span>
+                            <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div class="message-content">
+                            ✅ <strong>No QoS anomalies detected</strong><br>
+                            🎯 All cells operating within normal parameters<br>
+                            📊 System health: Excellent<br>
+                            🔍 Continuous monitoring active
+                        </div>
+                        <div class="message-agent">QoS Anomaly Detection Agent</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Update traffic forecasts with real data
+        async function updateTrafficForecasts() {
+            const data = await fetchData('http://localhost:8080/telecom/forecasts');
+            const container = document.getElementById('traffic-forecasts');
+            
+            if (data && data.forecasts && data.forecasts.length > 0) {
+                container.innerHTML = '';
+                data.forecasts.slice(0, 3).forEach(forecast => {
+                    const shortTerm = forecast.multi_timescale_forecasts.short_term;
+                    const mediumTerm = forecast.multi_timescale_forecasts.medium_term;
+                    const trend = shortTerm.trend_direction;
+                    const trendIcon = trend === 'increasing' ? '📈' : trend === 'decreasing' ? '📉' : '➡️';
+                    
+                    const forecastElement = document.createElement('div');
+                    forecastElement.className = 'message-item traffic';
+                    forecastElement.innerHTML = `
+                        <div class="message-header">
+                            <span class="message-type">FORECAST</span>
+                            <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div class="message-content">
+                            <strong>${forecast.cell_id.toUpperCase()}</strong><br>
+                            ${trendIcon} <strong>${trend.toUpperCase()}</strong> trend<br>
+                            📊 Current: ${shortTerm.current_throughput.toFixed(1)} Mbps<br>
+                            🔮 5min: ${shortTerm.forecasted_throughput.toFixed(1)} Mbps<br>
+                            ⏰ 1hr: ${mediumTerm.forecasted_throughput.toFixed(1)} Mbps<br>
+                            👥 UEs: ${shortTerm.current_active_ues} → ${shortTerm.forecasted_active_ues}<br>
+                            🎯 Confidence: ${(shortTerm.confidence * 100).toFixed(1)}%
+                        </div>
+                        <div class="message-agent">Traffic Forecast Agent</div>
+                    `;
+                    container.appendChild(forecastElement);
+                });
+            } else {
+                // Show simulated forecasts
+                container.innerHTML = `
+                    <div class="message-item traffic">
+                        <div class="message-header">
+                            <span class="message-type">FORECAST</span>
+                            <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div class="message-content">
+                            <strong>CELL_001</strong><br>
+                            📈 <strong>INCREASING</strong> trend<br>
+                            📊 Current: 45.2 Mbps<br>
+                            🔮 5min: 47.8 Mbps<br>
+                            ⏰ 1hr: 52.1 Mbps<br>
+                            👥 UEs: 150 → 165<br>
+                            🎯 Confidence: 85.3%
+                        </div>
+                        <div class="message-agent">Traffic Forecast Agent</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Update energy optimization with real data
+        async function updateEnergyOptimization() {
+            const data = await fetchData('http://localhost:8080/telecom/energy');
+            const container = document.getElementById('energy-optimization');
+            
+            if (data && data.recommendations && data.recommendations.length > 0) {
+                container.innerHTML = '';
+                data.recommendations.slice(0, 3).forEach(rec => {
+                    const recElement = document.createElement('div');
+                    recElement.className = 'message-item energy';
+                    recElement.innerHTML = `
+                        <div class="message-header">
+                            <span class="message-type">ENERGY</span>
+                            <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div class="message-content">
+                            Cell ${rec.cell_id}: ${rec.action}<br>
+                            Savings: ${rec.energy_savings.toFixed(2)}W | Green Score: ${rec.green_score ? rec.green_score.toFixed(3) : 'N/A'}
+                        </div>
+                        <div class="message-agent">Energy Optimization Agent</div>
+                    `;
+                    container.appendChild(recElement);
+                });
+            } else {
+                // Show system status - no energy optimizations needed
+                container.innerHTML = `
+                    <div class="message-item energy">
+                        <div class="message-header">
+                            <span class="message-type">STATUS</span>
+                            <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div class="message-content">
+                            ⚡ <strong>Optimal energy consumption</strong><br>
+                            🔋 All cells operating efficiently<br>
+                            🌱 Green score: Excellent<br>
+                            📊 Continuous optimization monitoring
+                        </div>
+                        <div class="message-agent">Energy Optimization Agent</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Update security events with real data
+        async function updateSecurityEvents() {
+            const data = await fetchData('http://localhost:8080/telecom/security');
+            const container = document.getElementById('security-events');
+            
+            if (data && data.events && data.events.length > 0) {
+                container.innerHTML = '';
+                data.events.slice(0, 3).forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = `alert-item ${event.threat_level}`;
+                    eventElement.innerHTML = `
+                        <strong>${event.event_type.toUpperCase()}</strong><br>
+                        Threat Level: ${event.threat_level}<br>
+                        <small>IMSI: ${event.imsi} | Location: ${event.location}</small>
+                    `;
+                    container.appendChild(eventElement);
+                });
+            } else {
+                // Show simulated events
+                container.innerHTML = `
+                    <div class="alert-item medium">
+                        <strong>SUSPICIOUS BEHAVIOR</strong><br>
+                        Threat Level: medium<br>
+                        <small>IMSI: 0010100000000003 | Location: Cell-003</small>
+                    </div>
+                `;
+            }
+        }
+        
+        // Update recent alerts and actions
+        function updateRecentAlerts() {
+            const container = document.getElementById('recent-alerts');
+            const recentActions = [
+                { type: 'qos', action: 'QoS anomaly detected', time: new Date(), status: 'approved' },
+                { type: 'energy', action: 'Sleep mode recommendation', time: new Date(), status: 'executed' },
+                { type: 'security', action: 'Suspicious UE blocked', time: new Date(), status: 'approved' },
+                { type: 'traffic', action: 'Traffic forecast updated', time: new Date(), status: 'monitoring' }
+            ];
+            
+                container.innerHTML = '';
+            recentActions.forEach(action => {
+                const actionElement = document.createElement('div');
+                actionElement.className = `message-item ${action.type}`;
+                actionElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-type">${action.status.toUpperCase()}</span>
+                        <span class="message-time">${action.time.toLocaleTimeString()}</span>
+                        </div>
+                    <div class="message-content">${action.action}</div>
+                    <div class="message-agent">System Action</div>
+                `;
+                container.appendChild(actionElement);
+            });
+        }
+        
+        // Main update function
+        async function updateDashboard() {
+            updateStatusBar();
+            updateAgentStatus();
+            updateMetrics();
+            simulateMessageFlow();
+            updateRecentAlerts();
+            
+            await Promise.all([
+                updateQoSAlerts(),
+                updateTrafficForecasts(),
+                updateEnergyOptimization(),
+                updateSecurityEvents()
+            ]);
+            
+            lastUpdateTime = new Date();
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts first
+            initializeCharts();
+            
+            // Add flow node interactions
+            addFlowNodeInteractions();
+            
+            // Initial dashboard update
+            updateDashboard();
+            updateCharts();
+            
+            // Auto-refresh every 5 seconds
+            setInterval(() => {
+                updateDashboard();
+                updateCharts();
+            }, 5000);
+        });
+        
+        // Update refresh indicator
+        setInterval(() => {
+            const indicator = document.getElementById('refresh-indicator');
+            const seconds = Math.floor((5000 - (Date.now() - lastUpdateTime) % 5000) / 1000);
+            indicator.textContent = `🔄 Auto-refresh: ${seconds}s`;
+        }, 1000);
+        
+        // Add click interactions to flow nodes
+        function addFlowNodeInteractions() {
+            const flowNodes = document.querySelectorAll('.flow-node');
+            flowNodes.forEach(node => {
+                node.addEventListener('click', function() {
+                    // Add visual feedback
+                    this.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
