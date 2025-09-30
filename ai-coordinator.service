@@ -1,0 +1,16 @@
+[Unit]
+Description=AI Safety Governance Coordinator
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ai_agents
+ExecStart=/usr/bin/python3 coordinator.py
+Restart=always
+RestartSec=10
+Environment=REDIS_URL=redis://127.0.0.1:6379/0
+Environment=POLICY_FILE=/opt/ai_agents/policy.yaml
+
+[Install]
+WantedBy=multi-user.target

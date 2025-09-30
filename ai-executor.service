@@ -1,0 +1,17 @@
+[Unit]
+Description=AI Safe Action Executor
+After=network.target redis.service ai-coordinator.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ai_agents
+ExecStart=/usr/bin/python3 executor.py
+Restart=always
+RestartSec=10
+Environment=REDIS_URL=redis://127.0.0.1:6379/0
+Environment=CONTROL_API_URL=http://127.0.0.1:5001
+Environment=CONTROL_API_KEY=secret
+
+[Install]
+WantedBy=multi-user.target
