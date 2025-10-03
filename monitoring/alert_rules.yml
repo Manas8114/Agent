@@ -1,0 +1,133 @@
+# Alert rules for Enhanced Telecom AI System
+groups:
+  - name: telecom_ai_alerts
+    rules:
+      # System Health Alerts
+      - alert: SystemDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute."
+
+      # High Latency Alert
+      - alert: HighLatency
+        expr: telecom_latency_ms > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency detected"
+          description: "Latency is {{ $value }}ms, above threshold of 100ms"
+
+      # Low Throughput Alert
+      - alert: LowThroughput
+        expr: telecom_throughput_mbps < 50
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low throughput detected"
+          description: "Throughput is {{ $value }}Mbps, below threshold of 50Mbps"
+
+      # High Packet Loss
+      - alert: HighPacketLoss
+        expr: telecom_packet_loss_rate > 0.05
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High packet loss detected"
+          description: "Packet loss rate is {{ $value }}%, above threshold of 5%"
+
+      # QoS Anomaly Detected
+      - alert: QoSAnomaly
+        expr: qos_anomaly_score < -0.5
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "QoS anomaly detected"
+          description: "QoS anomaly score is {{ $value }}, indicating potential issues"
+
+      # Failure Prediction Alert
+      - alert: FailurePredicted
+        expr: failure_prediction_probability > 0.8
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "System failure predicted"
+          description: "Failure prediction model indicates {{ $value }}% probability of failure"
+
+      # High Energy Consumption
+      - alert: HighEnergyConsumption
+        expr: energy_consumption_kw > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High energy consumption"
+          description: "Energy consumption is {{ $value }}kW, above threshold of 5kW"
+
+      # Security Threat Detected
+      - alert: SecurityThreat
+        expr: security_threat_level > 0.7
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Security threat detected"
+          description: "Security threat level is {{ $value }}, indicating potential attack"
+
+      # Data Quality Issues
+      - alert: DataQualityIssue
+        expr: data_quality_score < 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Data quality issues detected"
+          description: "Data quality score is {{ $value }}, below threshold of 0.8"
+
+      # Agent Coordination Issues
+      - alert: CoordinationFailure
+        expr: agent_coordination_score < 0.7
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Agent coordination issues"
+          description: "Agent coordination score is {{ $value }}, indicating coordination problems"
+
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: node_cpu_usage_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%, above threshold of 90%"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: node_memory_usage_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}%, above threshold of 90%"
+
+      # Disk Space Low
+      - alert: DiskSpaceLow
+        expr: node_filesystem_free_bytes / node_filesystem_size_bytes < 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk space low"
+          description: "Disk space is {{ $value }}% free, below threshold of 10%"

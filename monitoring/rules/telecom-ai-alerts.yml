@@ -1,0 +1,74 @@
+groups:
+  - name: telecom-ai-alerts
+    rules:
+      - alert: APIDown
+        expr: up{job="telecom-ai-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Enhanced Telecom AI API is down"
+          description: "The API has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job="telecom-ai-api",status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "The API error rate is above 10% for more than 2 minutes."
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="telecom-ai-api"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "The 95th percentile response time is above 2 seconds for more than 5 minutes."
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="telecom-ai-api"} > 1000000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "The API memory usage is above 1GB for more than 5 minutes."
+
+      - alert: LowAgentAccuracy
+        expr: ai_agent_accuracy{job="telecom-ai-api"} < 0.8
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low AI agent accuracy"
+          description: "AI agent {{ $labels.agent_name }} accuracy is below 80% for more than 10 minutes."
+
+      - alert: CoordinationScoreLow
+        expr: coordination_score{job="telecom-ai-api"} < 0.7
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low coordination score"
+          description: "The coordination score is below 0.7 for more than 5 minutes."
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 1 minute."
+
+      - alert: MLflowDown
+        expr: up{job="mlflow"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "MLflow is down"
+          description: "MLflow has been down for more than 2 minutes."

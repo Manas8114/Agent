@@ -1,0 +1,187 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Enhanced Telecom AI System",
+    "tags": ["telecom", "ai", "monitoring"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Health Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"telecom-ai-api\"}",
+            "legendFormat": "API Status"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "red",
+                  "value": 0
+                },
+                {
+                  "color": "green",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "API Response Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"telecom-ai-api\"}[5m]))",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=\"telecom-ai-api\"}[5m]))",
+            "legendFormat": "50th percentile"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Response Time (s)"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"telecom-ai-api\"}[5m])",
+            "legendFormat": "Requests/sec"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Requests/sec"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "id": 4,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"telecom-ai-api\",status=~\"5..\"}[5m])",
+            "legendFormat": "5xx errors"
+          },
+          {
+            "expr": "rate(http_requests_total{job=\"telecom-ai-api\",status=~\"4..\"}[5m])",
+            "legendFormat": "4xx errors"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Errors/sec"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        }
+      },
+      {
+        "id": 5,
+        "title": "AI Agent Performance",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "ai_agent_accuracy{job=\"telecom-ai-api\"}",
+            "legendFormat": "{{agent_name}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 16
+        }
+      },
+      {
+        "id": 6,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes{job=\"telecom-ai-api\"}",
+            "legendFormat": "Memory Usage"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Bytes"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 24
+        }
+      },
+      {
+        "id": 7,
+        "title": "CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(process_cpu_seconds_total{job=\"telecom-ai-api\"}[5m])",
+            "legendFormat": "CPU Usage"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "CPU %"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 24
+        }
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s"
+  }
+}

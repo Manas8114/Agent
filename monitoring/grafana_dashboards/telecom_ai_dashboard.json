@@ -1,0 +1,152 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Enhanced Telecom AI System Dashboard",
+    "tags": ["telecom", "ai", "monitoring"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"telecom-api\"}",
+            "legendFormat": "API Server"
+          },
+          {
+            "expr": "up{job=~\"*-agent\"}",
+            "legendFormat": "AI Agents"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Latency Trends",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "telecom_latency_ms",
+            "legendFormat": "Latency (ms)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Throughput",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "telecom_throughput_mbps",
+            "legendFormat": "Throughput (Mbps)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Packet Loss Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "telecom_packet_loss_rate * 100",
+            "legendFormat": "Packet Loss (%)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "AI Agent Performance",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "qos_anomaly_accuracy",
+            "legendFormat": "QoS Anomaly"
+          },
+          {
+            "expr": "failure_prediction_accuracy",
+            "legendFormat": "Failure Prediction"
+          },
+          {
+            "expr": "traffic_forecast_accuracy",
+            "legendFormat": "Traffic Forecast"
+          },
+          {
+            "expr": "energy_optimization_efficiency",
+            "legendFormat": "Energy Optimization"
+          },
+          {
+            "expr": "security_detection_rate",
+            "legendFormat": "Security Detection"
+          },
+          {
+            "expr": "data_quality_score",
+            "legendFormat": "Data Quality"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "Energy Consumption",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "energy_consumption_kw",
+            "legendFormat": "Energy (kW)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 7,
+        "title": "Security Threats",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "security_threat_level",
+            "legendFormat": "Threat Level"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 8,
+        "title": "System Resources",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "node_cpu_usage_percent",
+            "legendFormat": "CPU Usage (%)"
+          },
+          {
+            "expr": "node_memory_usage_percent",
+            "legendFormat": "Memory Usage (%)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32}
+      },
+      {
+        "id": 9,
+        "title": "Agent Coordination",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "agent_coordination_score",
+            "legendFormat": "Coordination Score"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s"
+  }
+}
