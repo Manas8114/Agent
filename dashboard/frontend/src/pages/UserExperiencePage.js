@@ -7,42 +7,26 @@ import {
   Download,
   Moon,
   Sun,
-  Clock
+  Clock,
+  RefreshCw
 } from 'lucide-react';
 
-// AI 4.0 Components
-import SystemOverviewPanel from '../components/ai4/SystemOverviewPanel';
+// Components
 import UserExperiencePanel from '../components/ai4/UserExperiencePanel';
-import YouTubeDemoPanel from '../components/ai4/YouTubeDemoPanel';
-import IBNPanel from '../components/ai4/IBNPanel';
-import ZTAPanel from '../components/ai4/ZTAPanel';
-import QuantumSafePanel from '../components/ai4/QuantumSafePanel';
-import FederationPanel from '../components/ai4/FederationPanel';
-import SelfEvolutionPanel from '../components/ai4/SelfEvolutionPanel';
-import ObservabilityPanel from '../components/ai4/ObservabilityPanel';
-import APIDocumentationPanel from '../components/ai4/APIDocumentationPanel';
 
 // Services
 import { fetchAI4Data } from '../services/ai4Service';
 
-const AI4Dashboard = () => {
+const UserExperiencePage = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(5000);
+  const [refreshInterval, setRefreshInterval] = useState(2000);
   const [systemData, setSystemData] = useState({
     health: null,
-    kpis: null,
-    ibn: null,
-    zta: null,
-    quantum: null,
-    federation: null,
-    selfEvolution: null,
-    observability: null,
-    api: null
+    kpis: null
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [componentErrors] = useState({});
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
   // Auto-refresh functionality
@@ -50,78 +34,27 @@ const AI4Dashboard = () => {
     try {
       setError(null);
       
-      // Create simulated data for Federation and Self-Evolution
-      const simulatedFederationData = {
-        total_nodes: 5,
-        active_nodes: 4,
-        updates_shared: 12,
-        aggregations_total: 8,
-        avg_model_accuracy: 0.913,
-        cooperative_scenarios_handled: 3,
-        operators: [
-          { name: "Operator Alpha", status: "active", region: "North America" },
-          { name: "Operator Beta", status: "active", region: "Europe" },
-          { name: "Operator Gamma", status: "active", region: "Asia Pacific" },
-          { name: "Operator Delta", status: "active", region: "South America" }
-        ],
-        cooperation_events: [
-          { id: 1, type: "Traffic Spike", description: "Coordinated load balancing across regions", timestamp: new Date().toISOString() },
-          { id: 2, type: "Model Update", description: "Shared federated learning model", timestamp: new Date().toISOString() },
-          { id: 3, type: "Failure Recovery", description: "Cross-operator backup activation", timestamp: new Date().toISOString() }
-        ],
-        update_metrics: {
-          successful_updates: 10,
-          failed_updates: 2,
-          success_rate: 0.833
-        }
-      };
-
-      const simulatedSelfEvolutionData = {
-        agent_id: "multi_agent_system",
-        evolution_round: 12,
-        architecture_improvement: 0.15,
-        hyperparameter_optimization: {
-          learning_rate: 0.0012,
-          batch_size: 128,
-          hidden_layers: 4,
-          dropout_rate: 0.3
-        },
-        performance_improvement: 0.22,
-        evolution_status: "evolving",
-        active_tasks: [
-          { id: 1, name: "Neural Architecture Search", status: "running", progress: 75 },
-          { id: 2, name: "Hyperparameter Optimization", status: "running", progress: 60 },
-          { id: 3, name: "Performance Evaluation", status: "pending", progress: 0 }
-        ],
-        kpi_improvements: {
-          latency_ms: { baseline: 50.0, current: 42.5, improvement_percent: 15.0, confidence: 0.95 },
-          throughput_mbps: { baseline: 100.0, current: 125.0, improvement_percent: 25.0, confidence: 0.92 },
-          energy_efficiency: { baseline: 0.8, current: 0.92, improvement_percent: 15.0, confidence: 0.88 },
-          accuracy: { baseline: 0.85, current: 0.91, improvement_percent: 7.1, confidence: 0.97 }
-        },
-        real_time_metrics: {
-          latency_ms: 42.5,
-          throughput_mbps: 125.0,
-          energy_efficiency: 0.92,
-          active_agents: 6
-        }
-      };
-
-      // Try to fetch real data for other components
+      // Try to fetch real data
       let realData = {};
       try {
         realData = await fetchAI4Data();
       } catch (error) {
-        console.warn('Using fallback data for some components:', error.message);
+        console.warn('Using fallback data:', error.message);
+        // Use simulated data if real data is not available
+        realData = {
+          health: { status: 'healthy', uptime: 86400 },
+          kpis: {
+            latency_ms: 45,
+            throughput_mbps: 125,
+            signal_strength: -65,
+            connection_quality: 95,
+            user_count: 1250,
+            data_volume_gb: 2.5
+          }
+        };
       }
 
-      // Combine real data with simulated data
-      setSystemData({
-        ...realData,
-        federation: simulatedFederationData,
-        selfEvolution: simulatedSelfEvolutionData
-      });
-      
+      setSystemData(realData);
       setLastUpdate(new Date());
     } catch (err) {
       console.error('Failed to refresh data:', err);
@@ -163,13 +96,11 @@ const AI4Dashboard = () => {
   // Export functionality
   const exportReport = (format) => {
     const timestamp = new Date().toISOString().split('T')[0];
-    const filename = `telecom-ai4-report-${timestamp}.${format}`;
+    const filename = `user-experience-report-${timestamp}.${format}`;
     
     if (format === 'pdf') {
-      // PDF export logic would go here
       console.log(`Exporting PDF report: ${filename}`);
     } else if (format === 'csv') {
-      // CSV export logic would go here
       console.log(`Exporting CSV report: ${filename}`);
     }
   };
@@ -179,7 +110,7 @@ const AI4Dashboard = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="loading-spinner mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading AI 4.0 Dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading User Experience Dashboard...</p>
         </div>
       </div>
     );
@@ -194,7 +125,7 @@ const AI4Dashboard = () => {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
               <div className="flex items-center space-x-4">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Telecom AI 4.0 Dashboard
+                  User Experience Dashboard
                 </h1>
                 <div className="flex items-center space-x-2">
                   <div className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -232,12 +163,20 @@ const AI4Dashboard = () => {
                     onChange={(e) => setRefreshInterval(Number(e.target.value))}
                     className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
+                    <option value={1000}>1s</option>
+                    <option value={2000}>2s</option>
                     <option value={5000}>5s</option>
                     <option value={10000}>10s</option>
-                    <option value={30000}>30s</option>
-                    <option value={60000}>1m</option>
                   </select>
                 </div>
+
+                {/* Manual refresh */}
+                <button
+                  onClick={refreshData}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </button>
 
                 {/* Dark mode toggle */}
                 <button
@@ -291,115 +230,16 @@ const AI4Dashboard = () => {
 
         {/* Main content */}
         <div className="flex-1 p-4 lg:p-6 space-y-4 lg:space-y-6 overflow-y-auto">
-          {/* System Overview Panel */}
+          {/* User Experience Panel */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <SystemOverviewPanel 
-              data={systemData.health}
-              kpis={systemData.kpis}
-              onRefresh={refreshData}
-            />
-          </motion.div>
-
-          {/* User Experience Panel */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-          >
             <UserExperiencePanel 
               data={systemData.health}
               onRefresh={refreshData}
             />
-          </motion.div>
-
-          {/* YouTube Demo Panel */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <YouTubeDemoPanel 
-              data={systemData.health}
-              onRefresh={refreshData}
-            />
-          </motion.div>
-
-          {/* AI 4.0 Feature Panels */}
-          <div className="dashboard-grid">
-            {/* Intent-Based Networking */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <IBNPanel data={systemData.ibn} />
-            </motion.div>
-
-            {/* Zero-Touch Automation */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <ZTAPanel data={systemData.zta} />
-            </motion.div>
-
-            {/* Quantum-Safe Security */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <QuantumSafePanel data={systemData.quantum} />
-            </motion.div>
-
-            {/* Global Multi-Operator Federation */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <FederationPanel 
-                data={systemData.federation} 
-                loading={!systemData.federation && loading}
-                error={componentErrors.federation}
-              />
-            </motion.div>
-
-            {/* Self-Evolving AI Agents */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              <SelfEvolutionPanel 
-                data={systemData.selfEvolution} 
-                loading={!systemData.selfEvolution && loading}
-                error={componentErrors.selfEvolution}
-              />
-            </motion.div>
-
-            {/* Enhanced Observability */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              <ObservabilityPanel data={systemData.observability} />
-            </motion.div>
-          </div>
-
-          {/* API & Documentation Panel - Full width */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-          >
-            <APIDocumentationPanel data={systemData.api} />
           </motion.div>
         </div>
       </div>
@@ -407,4 +247,4 @@ const AI4Dashboard = () => {
   );
 };
 
-export default AI4Dashboard;
+export default UserExperiencePage;

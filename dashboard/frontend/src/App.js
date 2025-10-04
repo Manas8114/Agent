@@ -8,6 +8,8 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import AI4Dashboard from './pages/AI4Dashboard';
+import UserExperiencePage from './pages/UserExperiencePage';
+import YouTubeDemoPage from './pages/YouTubeDemoPage';
 import RealDataDashboard from './pages/RealDataDashboard';
 import Agents from './pages/Agents';
 import Analytics from './pages/Analytics';
@@ -268,6 +270,32 @@ function App() {
                             transition={{ duration: 0.3 }}
                           >
                             <AI4Dashboard />
+                          </motion.div>
+                        } 
+                      />
+                      <Route 
+                        path="/d/user-experience" 
+                        element={
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <UserExperiencePage />
+                          </motion.div>
+                        } 
+                      />
+                      <Route 
+                        path="/d/youtube-demo" 
+                        element={
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <YouTubeDemoPage />
                           </motion.div>
                         } 
                       />

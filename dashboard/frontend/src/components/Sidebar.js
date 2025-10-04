@@ -9,10 +9,13 @@ import {
   DocumentCheckIcon,
   Cog6ToothIcon,
   XMarkIcon,
+  PlayIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'AI 4.0 Dashboard', href: '/', icon: HomeIcon },
+  { name: 'User Experience', href: '/d/user-experience', icon: PlayIcon },
+  { name: 'YouTube Demo', href: '/d/youtube-demo', icon: PlayIcon },
   { name: 'Real Data Dashboard', href: '/real-data', icon: HomeIcon },
   { name: 'Legacy Dashboard', href: '/dashboard', icon: ChartBarIcon },
   { name: 'AI Agents', href: '/agents', icon: CpuChipIcon },
