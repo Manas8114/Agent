@@ -106,7 +106,6 @@ const RealTimeFederationPanel = ({ data, loading = false, error = null }) => {
     avg_model_accuracy = 0,
     cooperative_scenarios_handled = 0,
     operators = [],
-    cooperation_events = [],
     update_metrics = {}
   } = data;
 

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "create network intent for ibn",
+    "description": "Test the POST /api/v1/telecom/intent endpoint to verify that a high-level network intent can be created successfully. Validate that the intent is translated into actionable policies, the response contains the intent_id, status, and enforcement logs, and no violations occur under defined constraints."
+  },
+  {
+    "id": "TC002",
+    "title": "get zero touch automation status",
+    "description": "Test the GET /api/v1/telecom/zta-status endpoint to verify that the Zero-Touch Automation status is returned correctly. Validate the presence of status, active pipelines, and deployment metrics in the response."
+  },
+  {
+    "id": "TC003",
+    "title": "get quantum safe security status",
+    "description": "Test the GET /api/v1/telecom/quantum-status endpoint to verify that the Quantum-Safe Security status is returned correctly. Validate the security level, supported algorithms, and threat detection information in the response."
+  },
+  {
+    "id": "TC004",
+    "title": "get global federation status",
+    "description": "Test the GET /api/v1/telecom/federation endpoint to verify that the Global Federation status is returned correctly. Validate total nodes, active nodes, updates shared, aggregations total, and average model accuracy in the response."
+  },
+  {
+    "id": "TC005",
+    "title": "get self evolving agents status",
+    "description": "Test the GET /api/v1/telecom/self-evolution endpoint to verify that the Self-Evolving Agents status is returned correctly. Validate agent id, evolution round, architecture improvement, performance improvement, and evolution status in the response."
+  },
+  {
+    "id": "TC006",
+    "title": "get qos anomaly detection results",
+    "description": "Test the GET /api/v1/agents/qos-anomaly endpoint to verify that QoS anomaly detection results are returned correctly. Validate the anomalies array, confidence score, and timestamp in the response."
+  },
+  {
+    "id": "TC007",
+    "title": "get real time data for all components",
+    "description": "Test the GET /api/v1/real-data endpoint to verify that real-time data for all system components is returned correctly. Validate the presence and accuracy of health, KPIs, federation, and self-evolution data in the response."
+  },
+  {
+    "id": "TC008",
+    "title": "system health check",
+    "description": "Test the GET /api/v1/health endpoint to verify that the system health status is returned correctly. Validate the status, timestamp, version, and components information in the response."
+  },
+  {
+    "id": "TC009",
+    "title": "get system metrics",
+    "description": "Test the GET /api/v1/metrics endpoint to verify that system metrics are returned correctly. Validate CPU usage, memory usage, network latency, and AI model accuracy in the response."
+  },
+  {
+    "id": "TC010",
+    "title": "ingest new data",
+    "description": "Test the POST /api/v1/data/ingest endpoint to verify that new telecom data can be ingested successfully. Validate that the request accepts data type, data object, and timestamp, and the response confirms successful ingestion."
+  }
+]

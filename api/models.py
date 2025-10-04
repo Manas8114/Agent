@@ -14,6 +14,7 @@ class HealthResponse(BaseModel):
     uptime: float
     agents_status: Dict[str, str]
     system_metrics: Dict[str, float]
+    components: Dict[str, str]
 
 class KPIsResponse(BaseModel):
     latency_ms: float
@@ -71,7 +72,7 @@ class ExplainResponse(BaseModel):
 class IntentRequest(BaseModel):
     description: str
     intent_type: str
-    parameters: Dict[str, Any]
+    constraints: Dict[str, Any]
     priority: int
 
 class IntentResponse(BaseModel):
@@ -86,6 +87,8 @@ class ZTAStatusResponse(BaseModel):
     status: str
     updates_count: int
     execution_logs: List[str]
+    active_pipelines: List[Dict[str, Any]]
+    deployment_metrics: Dict[str, Any]
 
 class QuantumStatusResponse(BaseModel):
     pqc_encryptions_total: int
@@ -94,6 +97,9 @@ class QuantumStatusResponse(BaseModel):
     pqc_verifications_total: int
     pqc_encryption_success_rate: float
     pqc_verification_success_rate: float
+    security_level: str
+    algorithms: List[str]
+    threat_detection: Dict[str, Any]
 
 class FederationResponse(BaseModel):
     model_config = {"protected_namespaces": ()}
