@@ -1,0 +1,11 @@
+{
+  "description": "Test intent for QoS optimization with no violations",
+  "intent_type": "qos-optimization",
+  "constraints": {
+    "max_latency_ms": 50,
+    "min_throughput_mbps": 100,
+    "no_security_violations": true
+  },
+  "priority": 5
+}
+

@@ -596,3 +596,4 @@ async def ingest_data(data_request: Dict[str, Any]):
     except Exception as e:
         logging.error(f"Failed to ingest data: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+

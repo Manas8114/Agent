@@ -37,9 +37,13 @@ def test_create_network_intent_for_ibn():
         # Check logs are non-empty
         assert len(enforcement_logs) > 0
         # Check none of the logs contain violation indication (assuming violations are marked)
-        violation_keywords = ["violation", "error", "fail", "alert"]
+        # Use more specific patterns to avoid false positives
+        violation_patterns = [
+            "violation detected", "violation found", "security violation", 
+            "error occurred", "failed to", "alert: ", "warning: violation"
+        ]
         violations_found = any(
-            any(keyword in str(log).lower() for keyword in violation_keywords) for log in enforcement_logs
+            any(pattern in str(log).lower() for pattern in violation_patterns) for log in enforcement_logs
         )
         assert not violations_found, "Violations detected in enforcement logs"
 

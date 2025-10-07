@@ -6,16 +6,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Components
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import ErrorBoundary from './components/ErrorBoundary';
 import Dashboard from './pages/Dashboard';
 import AI4Dashboard from './pages/AI4Dashboard';
-import UserExperiencePage from './pages/UserExperiencePage';
-import YouTubeDemoPage from './pages/YouTubeDemoPage';
 import RealDataDashboard from './pages/RealDataDashboard';
 import Agents from './pages/Agents';
 import Analytics from './pages/Analytics';
 import Security from './pages/Security';
 import DataQuality from './pages/DataQuality';
 import Settings from './pages/Settings';
+import TestPage from './TestPage';
+import YouTubePage from './pages/YouTubePage';
+import GamingPage from './pages/GamingPage';
+import QuantumSecurityPage from './pages/QuantumSecurityPage';
 
 // Context
 import { WebSocketProvider } from './context/WebSocketContext';
@@ -23,6 +26,10 @@ import { DataProvider } from './context/DataContext';
 
 // Hooks
 import { useWebSocket } from './hooks/useWebSocket';
+
+// Utils
+import { initializeErrorHandling } from './utils/errorHandler';
+import './utils/metamaskSuppressor'; // Import MetaMask suppressor
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,6 +40,74 @@ function App() {
   const ws = useWebSocket();
 
   useEffect(() => {
+    // Initialize error handling first
+    initializeErrorHandling();
+    
+    // More aggressive MetaMask error suppression
+    const suppressMetaMaskErrors = () => {
+      // Override window.onerror
+      const originalError = window.onerror;
+      window.onerror = (message, source, lineno, colno, error) => {
+        if (message && (
+          message.includes('MetaMask') || 
+          message.includes('chrome-extension') ||
+          message.includes('nkbihfbeogaeaoehlefnkodbefgpgknn') ||
+          message.includes('Failed to connect to MetaMask') ||
+          message.includes('ethereum') ||
+          message.includes('web3')
+        )) {
+          console.warn('MetaMask extension error suppressed:', message);
+          return true; // Prevent default error handling
+        }
+        if (originalError) {
+          return originalError(message, source, lineno, colno, error);
+        }
+        return false;
+      };
+
+      // Override unhandledrejection
+      window.addEventListener('unhandledrejection', (event) => {
+        const reason = event.reason;
+        if (reason && (
+          (typeof reason === 'string' && (
+            reason.includes('MetaMask') ||
+            reason.includes('Failed to connect to MetaMask') ||
+            reason.includes('ethereum') ||
+            reason.includes('web3')
+          )) ||
+          (reason && reason.message && (
+            reason.message.includes('MetaMask') ||
+            reason.message.includes('Failed to connect to MetaMask') ||
+            reason.message.includes('ethereum') ||
+            reason.message.includes('web3')
+          ))
+        )) {
+          console.warn('MetaMask promise rejection suppressed:', reason);
+          event.preventDefault();
+          return false;
+        }
+      });
+
+      // Override console.error for MetaMask
+      const originalConsoleError = console.error;
+      console.error = (...args) => {
+        const message = args.join(' ');
+        if (message && (
+          message.includes('MetaMask') ||
+          message.includes('Failed to connect to MetaMask') ||
+          message.includes('ethereum') ||
+          message.includes('web3') ||
+          message.includes('chrome-extension')
+        )) {
+          console.warn('MetaMask console error suppressed:', ...args);
+          return;
+        }
+        originalConsoleError.apply(console, args);
+      };
+    };
+
+    suppressMetaMaskErrors();
+    
     const initializeApp = async () => {
       try {
         setIsLoading(true);
@@ -83,9 +158,10 @@ function App() {
   }
 
   return (
-    <WebSocketProvider value={ws}>
-      <DataProvider>
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <ErrorBoundary>
+      <WebSocketProvider value={ws}>
+        <DataProvider>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <div className="min-h-screen bg-gray-50">
             <Toaster
               position="top-right"
@@ -273,32 +349,6 @@ function App() {
                           </motion.div>
                         } 
                       />
-                      <Route 
-                        path="/d/user-experience" 
-                        element={
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <UserExperiencePage />
-                          </motion.div>
-                        } 
-                      />
-                      <Route 
-                        path="/d/youtube-demo" 
-                        element={
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <YouTubeDemoPage />
-                          </motion.div>
-                        } 
-                      />
                       {/* Documentation Routes */}
                       <Route 
                         path="/docs/ai4.0_guide.md" 
@@ -326,16 +376,71 @@ function App() {
                           </motion.div>
                         } 
                       />
+                      {/* Feature Pages */}
+                      <Route 
+                        path="/youtube" 
+                        element={
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <YouTubePage />
+                          </motion.div>
+                        } 
+                      />
+                      <Route 
+                        path="/gaming" 
+                        element={
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <GamingPage />
+                          </motion.div>
+                        } 
+                      />
+                      <Route 
+                        path="/quantum-security" 
+                        element={
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <QuantumSecurityPage />
+                          </motion.div>
+                        } 
+                      />
+                      {/* Test Route */}
+                      <Route 
+                        path="/test" 
+                        element={
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <TestPage />
+                          </motion.div>
+                        } 
+                      />
                     </Routes>
                   </AnimatePresence>
                 </main>
               </div>
             </div>
           </div>
-        </Router>
-      </DataProvider>
-    </WebSocketProvider>
-  );
+          </Router>
+        </DataProvider>
+      </WebSocketProvider>
+    </ErrorBoundary>
+    );
 }
 
 export default App;

@@ -1,17 +1,16 @@
 {
   "status": "commited",
-  "type": "backend",
+  "type": "frontend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:8000",
-  "backendAuthType": "public",
+  "localEndpoint": "http://localhost:3000",
   "executionArgs": {
-    "projectName": "enhanced_telecom_ai",
-    "projectPath": "C:\\Users\\msgok\\Desktop\\G_agent\\6G\\New\\enhanced_telecom_ai",
+    "projectName": "event",
+    "projectPath": "C:\\Users\\msgok\\Desktop\\G_agent\\6G\\New\\event",
     "testIds": [],
-    "additionalInstruction": "Final comprehensive test run to verify ALL 10 tests now pass with 100% success rate.",
+    "additionalInstruction": "Test the YouTube demo, gaming user experience, and quantum security features in the dashboard. Verify all APIs are working and accessible through the frontend interface.",
     "envs": {
       "API_KEY": "sk-user-vO0wW4mv6zMiMH6pxMZIMtEVJ3pmuTygaBYoDsMfjtJCWFoNPMXr5oNu5DSijSxhnF_OLoxyRQluwYbCNWk2I8OHZjAnQQfzKe99dXWH2l_-3nvCJwo0aBOc5UE7Ybi4mWg"
     }
   },
-  "proxy": "http://8bf23f74-9938-464f-be08-d42d54f341f4:UtvaOeASIkEQLYRWwHiX97MPnQBOHmLZ@tun.testsprite.com:8080"
+  "proxy": "http://660348e5-4645-4db7-b25f-ff4375a967cd:KJhLQ9Fsnkm0jJPMHhByW6blMpAOcKgF@tun.testsprite.com:8080"
 }

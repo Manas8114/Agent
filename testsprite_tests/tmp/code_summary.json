@@ -1,368 +1,177 @@
 {
   "tech_stack": [
     "Python",
-    "FastAPI",
     "React",
+    "FastAPI",
+    "Node.js",
     "SQLite",
-    "PostgreSQL",
     "Docker",
     "Kubernetes",
     "Prometheus",
     "Grafana",
     "MLflow",
-    "Redis",
-    "Celery",
-    "Node.js",
-    "TailwindCSS",
+    "Framer Motion",
+    "Tailwind CSS",
     "WebSocket",
-    "REST API"
+    "REST API",
+    "Post-Quantum Cryptography"
   ],
   "features": [
     {
-      "name": "AI Agents API",
-      "description": "Core AI agents for anomaly detection, failure prediction, traffic forecasting, energy optimization, security detection, and data quality monitoring",
-      "files": [
-        "agents/qos_anomaly_detector.py",
-        "agents/failure_predictor.py",
-        "agents/traffic_forecaster.py",
-        "agents/energy_optimizer.py",
-        "agents/security_detector.py",
-        "agents/data_quality_monitor.py"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "AI Agents API",
-          "version": "1.0.0",
-          "description": "Core AI agents for telecom network intelligence"
-        },
-        "paths": {
-          "/api/v1/agents/qos-anomaly": {
-            "get": {
-              "summary": "Get QoS anomaly detection results",
-              "responses": {
-                "200": {
-                  "description": "QoS anomaly detection results",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "anomalies": {"type": "array"},
-                          "confidence": {"type": "number"},
-                          "timestamp": {"type": "string"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "AI 4.0 Features API",
-      "description": "Advanced AI 4.0 features including Intent-Based Networking (IBN), Zero-Touch Automation (ZTA), Quantum-Safe Security, Global Federation, and Self-Evolving Agents",
-      "files": [
-        "api/ai4_endpoints.py",
-        "core/ibn_controller.py",
-        "core/zero_touch.py",
-        "core/real_quantum_crypto.py",
-        "core/real_federation_manager.py",
-        "core/real_self_evolution_manager.py"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "AI 4.0 Features API",
-          "version": "1.0.0",
-          "description": "Advanced AI 4.0 features for next-generation telecom networks"
-        },
-        "paths": {
-          "/api/v1/telecom/intent": {
-            "post": {
-              "summary": "Create network intent for IBN",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "description": {"type": "string"},
-                        "intent_type": {"type": "string"},
-                        "constraints": {"type": "object"},
-                        "priority": {"type": "integer"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {
-                  "description": "Intent created successfully",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "intent_id": {"type": "string"},
-                          "status": {"type": "string"},
-                          "enforcement_logs": {"type": "array"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/api/v1/telecom/zta-status": {
-            "get": {
-              "summary": "Get Zero-Touch Automation status",
-              "responses": {
-                "200": {
-                  "description": "ZTA status information",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "status": {"type": "string"},
-                          "active_pipelines": {"type": "array"},
-                          "deployment_metrics": {"type": "object"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/api/v1/telecom/quantum-status": {
-            "get": {
-              "summary": "Get Quantum-Safe Security status",
-              "responses": {
-                "200": {
-                  "description": "Quantum security status",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "security_level": {"type": "string"},
-                          "algorithms": {"type": "array"},
-                          "threat_detection": {"type": "object"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/api/v1/telecom/federation": {
-            "get": {
-              "summary": "Get Global Federation status",
-              "responses": {
-                "200": {
-                  "description": "Federation status information",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "total_nodes": {"type": "integer"},
-                          "active_nodes": {"type": "integer"},
-                          "updates_shared": {"type": "integer"},
-                          "aggregations_total": {"type": "integer"},
-                          "avg_model_accuracy": {"type": "number"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/api/v1/telecom/self-evolution": {
-            "get": {
-              "summary": "Get Self-Evolving Agents status",
-              "responses": {
-                "200": {
-                  "description": "Self-evolution status",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "agent_id": {"type": "string"},
-                          "evolution_round": {"type": "integer"},
-                          "architecture_improvement": {"type": "number"},
-                          "performance_improvement": {"type": "number"},
-                          "evolution_status": {"type": "string"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "Real-time Dashboard API",
-      "description": "Real-time dashboard with live data updates, WebSocket connections, and real-time monitoring",
+      "name": "AI4Dashboard",
+      "description": "Main AI 4.0 dashboard with system overview, IBN, ZTA, quantum security, federation, and self-evolution panels",
       "files": [
         "dashboard/frontend/src/pages/AI4Dashboard.js",
-        "dashboard/frontend/src/pages/RealDataDashboard.js",
-        "dashboard/frontend/src/services/realTimeService.js",
-        "dashboard/frontend/src/hooks/useRealTimeData.js"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Real-time Dashboard API",
-          "version": "1.0.0",
-          "description": "Real-time dashboard for telecom AI monitoring"
-        },
-        "paths": {
-          "/api/v1/real-data": {
-            "get": {
-              "summary": "Get real-time data for all components",
-              "responses": {
-                "200": {
-                  "description": "Real-time system data",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "health": {"type": "object"},
-                          "kpis": {"type": "object"},
-                          "federation": {"type": "object"},
-                          "selfEvolution": {"type": "object"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+        "dashboard/frontend/src/components/ai4/SystemOverviewPanel.js",
+        "dashboard/frontend/src/components/ai4/IBNPanel.js",
+        "dashboard/frontend/src/components/ai4/ZTAPanel.js",
+        "dashboard/frontend/src/components/ai4/QuantumSafePanel.js",
+        "dashboard/frontend/src/components/ai4/FederationPanel.js",
+        "dashboard/frontend/src/components/ai4/SelfEvolutionPanel.js",
+        "dashboard/frontend/src/components/ai4/ObservabilityPanel.js",
+        "dashboard/frontend/src/components/ai4/APIDocumentationPanel.js"
+      ]
     },
     {
-      "name": "Monitoring and Metrics API",
-      "description": "Comprehensive monitoring with Prometheus metrics, system health checks, and observability features",
+      "name": "UserExperiencePanel",
+      "description": "Gaming and streaming performance metrics with real-time FPS, ping, jitter, buffering, and resolution tracking",
       "files": [
-        "monitoring/prometheus_server.py",
-        "monitoring/ai4_metrics.py",
-        "api/endpoints.py"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Monitoring API",
-          "version": "1.0.0",
-          "description": "System monitoring and metrics collection"
-        },
-        "paths": {
-          "/api/v1/health": {
-            "get": {
-              "summary": "System health check",
-              "responses": {
-                "200": {
-                  "description": "System health status",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "status": {"type": "string"},
-                          "timestamp": {"type": "string"},
-                          "version": {"type": "string"},
-                          "components": {"type": "object"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/api/v1/metrics": {
-            "get": {
-              "summary": "Get system metrics",
-              "responses": {
-                "200": {
-                  "description": "System metrics",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "cpu_usage": {"type": "number"},
-                          "memory_usage": {"type": "number"},
-                          "network_latency": {"type": "number"},
-                          "ai_model_accuracy": {"type": "number"}
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+        "dashboard/frontend/src/components/ai4/UserExperiencePanel.js"
+      ]
     },
     {
-      "name": "Data Management API",
-      "description": "Data ingestion, processing, and management for real-time telecom data",
+      "name": "YouTubeDemoPanel",
+      "description": "Live YouTube video integration with real-time streaming metrics overlay and AI allocation effects",
+      "files": [
+        "dashboard/frontend/src/components/ai4/YouTubeDemoPanel.js"
+      ]
+    },
+    {
+      "name": "QuantumSecurityVisualization",
+      "description": "Interactive quantum security dashboard with before/after comparison, animated data packet flow, and PQC algorithms",
+      "files": [
+        "dashboard/frontend/src/components/ai4/QuantumSafePanel.js",
+        "core/post_quantum_crypto.py"
+      ]
+    },
+    {
+      "name": "AI4APIEndpoints",
+      "description": "Comprehensive API endpoints for AI 4.0 features including IBN, ZTA, quantum security, federation, and self-evolution",
+      "files": [
+        "api/ai4_endpoints.py",
+        "api/ibn_endpoints.py",
+        "api/quantum_endpoints.py",
+        "api/endpoints.py",
+        "api/server.py"
+      ]
+    },
+    {
+      "name": "AIAgents",
+      "description": "Six AI agents for QoS anomaly detection, failure prediction, traffic forecasting, energy optimization, security detection, and data quality monitoring",
+      "files": [
+        "agents/qos_anomaly.py",
+        "agents/failure_prediction.py",
+        "agents/traffic_forecast.py",
+        "agents/energy_optimize.py",
+        "agents/security_detection.py",
+        "agents/data_quality.py",
+        "agents/base_agent.py",
+        "agents/marl_manager.py",
+        "agents/self_evolving_agents.py"
+      ]
+    },
+    {
+      "name": "CoreSystem",
+      "description": "Core system components including coordinator, metrics collector, data manager, and blockchain manager",
+      "files": [
+        "core/coordinator.py",
+        "core/metrics.py",
+        "core/data_manager.py",
+        "core/blockchain_manager.py",
+        "core/ibn_controller.py",
+        "core/zero_touch.py",
+        "core/global_federation.py",
+        "core/digital_twin.py"
+      ]
+    },
+    {
+      "name": "RealTimeData",
+      "description": "Real-time data processing and WebSocket communication for live updates",
+      "files": [
+        "dashboard/frontend/src/hooks/useRealTimeData.js",
+        "dashboard/frontend/src/context/WebSocketContext.js",
+        "dashboard/frontend/src/services/ai4Service.js"
+      ]
+    },
+    {
+      "name": "Monitoring",
+      "description": "Comprehensive monitoring with Prometheus metrics, Grafana dashboards, and observability",
+      "files": [
+        "monitoring/ai4_metrics.py",
+        "monitoring/prometheus.py",
+        "monitoring/grafana/",
+        "prometheus_server.py",
+        "grafana_server.py"
+      ]
+    },
+    {
+      "name": "DataManagement",
+      "description": "Data ingestion, processing, and management with real and synthetic data sources",
       "files": [
         "data/data_manager.py",
         "data/real_data_sources.py",
-        "data/sample_data_generator.py"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Data Management API",
-          "version": "1.0.0",
-          "description": "Data ingestion and processing for telecom AI"
-        },
-        "paths": {
-          "/api/v1/data/ingest": {
-            "post": {
-              "summary": "Ingest new data",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "data_type": {"type": "string"},
-                        "data": {"type": "object"},
-                        "timestamp": {"type": "string"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {
-                  "description": "Data ingested successfully"
-                }
-              }
-            }
-          }
-        }
-      }
+        "data/sample_data_generator.py",
+        "data/ingestion/",
+        "data/processed/",
+        "data/raw/"
+      ]
+    },
+    {
+      "name": "MLPipeline",
+      "description": "Machine learning pipeline with model training, validation, and deployment",
+      "files": [
+        "core/ml_models/real_ml_pipeline.py",
+        "notebooks/model_training_examples.ipynb"
+      ]
+    },
+    {
+      "name": "Deployment",
+      "description": "Docker containerization, Kubernetes deployment, and production configuration",
+      "files": [
+        "Dockerfile",
+        "docker-compose.yml",
+        "docker-compose.production.yml",
+        "kubernetes/telecom-ai-deployment.yaml",
+        "nginx/nginx.conf"
+      ]
+    },
+    {
+      "name": "Testing",
+      "description": "Comprehensive testing suite including integration tests, API tests, and validation",
+      "files": [
+        "test_integration.py",
+        "test_individual_apis.py",
+        "test_ibn.py",
+        "test_zta.py",
+        "test_quantum_safe.py",
+        "test_federation.py",
+        "test_self_evolving.py",
+        "test_observability.py",
+        "final_integration_test.py"
+      ]
+    },
+    {
+      "name": "Documentation",
+      "description": "Comprehensive documentation including guides, architecture docs, and security reviews",
+      "files": [
+        "README.md",
+        "docs/AI4_GUIDE.md",
+        "docs/TELECOM_AI4_AGENT_ARCHITECTURE.md",
+        "docs/QUANTUM_SECURITY_AUDIT.md",
+        "TELECOM_AI4_FEATURE_OVERVIEW.md",
+        "DEMO_GUIDE.md",
+        "HOW_TO_ACCESS_FEATURES.md"
+      ]
     }
   ]
 }

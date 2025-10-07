@@ -12,8 +12,6 @@ import {
 
 // AI 4.0 Components
 import SystemOverviewPanel from '../components/ai4/SystemOverviewPanel';
-import UserExperiencePanel from '../components/ai4/UserExperiencePanel';
-import YouTubeDemoPanel from '../components/ai4/YouTubeDemoPanel';
 import IBNPanel from '../components/ai4/IBNPanel';
 import ZTAPanel from '../components/ai4/ZTAPanel';
 import QuantumSafePanel from '../components/ai4/QuantumSafePanel';
@@ -304,29 +302,6 @@ const AI4Dashboard = () => {
             />
           </motion.div>
 
-          {/* User Experience Panel */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-          >
-            <UserExperiencePanel 
-              data={systemData.health}
-              onRefresh={refreshData}
-            />
-          </motion.div>
-
-          {/* YouTube Demo Panel */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <YouTubeDemoPanel 
-              data={systemData.health}
-              onRefresh={refreshData}
-            />
-          </motion.div>
 
           {/* AI 4.0 Feature Panels */}
           <div className="dashboard-grid">

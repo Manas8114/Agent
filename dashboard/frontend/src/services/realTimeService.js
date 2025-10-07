@@ -1,155 +1,199 @@
 /**
- * Real-Time Data Service for Telecom AI 4.0 Dashboard
- * Fetches live data from backend endpoints with error handling and retry logic
+ * Real-Time Service for Telecom AI 4.0
+ * Handles real-time data polling and WebSocket connections
  */
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
 class RealTimeService {
   constructor() {
     this.pollingInterval = null;
-    this.retryCount = 0;
-    this.maxRetries = 3;
-    this.retryDelay = 1000; // 1 second
-    this.isConnected = false;
     this.listeners = new Set();
+    this.isPolling = false;
+    this.connectionStatus = 'disconnected';
+    this.lastData = null;
+    this.errorCount = 0;
+    this.maxRetries = 3;
   }
 
   /**
-   * Add a listener for real-time data updates
+   * Add event listener for real-time updates
    */
   addListener(callback) {
     this.listeners.add(callback);
-    return () => this.listeners.delete(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      this.listeners.delete(callback);
+    };
   }
 
   /**
-   * Notify all listeners with new data
+   * Notify all listeners of data updates
    */
   notifyListeners(data) {
     this.listeners.forEach(callback => {
       try {
         callback(data);
       } catch (error) {
-        console.error('Error in listener callback:', error);
+        console.error('Error in real-time listener:', error);
       }
     });
   }
 
   /**
-   * Make HTTP request with retry logic
-   */
-  async makeRequest(url, options = {}) {
-    const defaultOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      timeout: 10000, // 10 seconds
-    };
-
-    const requestOptions = { ...defaultOptions, ...options };
-
-    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
-      try {
-        const response = await fetch(url, requestOptions);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        this.retryCount = 0;
-        this.isConnected = true;
-        return { success: true, data, error: null };
-      } catch (error) {
-        console.warn(`Request attempt ${attempt + 1} failed:`, error.message);
-        
-        if (attempt === this.maxRetries - 1) {
-          this.isConnected = false;
-          return { success: false, data: null, error: error.message };
-        }
-        
-        // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, this.retryDelay * (attempt + 1)));
-      }
-    }
-  }
-
-  /**
-   * Fetch all system data from backend
-   */
-  async fetchAllSystemData() {
-    const endpoints = [
-      { key: 'health', url: `${API_BASE_URL}/health` },
-      { key: 'kpis', url: `${API_BASE_URL}/telecom/kpis` },
-      { key: 'ibn', url: `${API_BASE_URL}/telecom/intent` },
-      { key: 'zta', url: `${API_BASE_URL}/telecom/zta-status` },
-      { key: 'quantum', url: `${API_BASE_URL}/telecom/quantum-status` },
-      { key: 'federation', url: `${API_BASE_URL}/telecom/federation` },
-      { key: 'selfEvolution', url: `${API_BASE_URL}/telecom/self-evolution` },
-      { key: 'observability', url: `${API_BASE_URL}/telecom/observability` }
-    ];
-
-    const results = {};
-    const errors = {};
-
-    // Fetch all endpoints in parallel
-    const promises = endpoints.map(async ({ key, url }) => {
-      const result = await this.makeRequest(url);
-      if (result.success) {
-        results[key] = result.data;
-      } else {
-        errors[key] = result.error;
-        results[key] = null;
-      }
-    });
-
-    await Promise.all(promises);
-
-    return {
-      data: results,
-      errors: Object.keys(errors).length > 0 ? errors : null,
-      isConnected: this.isConnected,
-      timestamp: new Date().toISOString()
-    };
-  }
-
-  /**
-   * Start real-time polling
+   * Start polling for real-time data
    */
   startPolling(interval = 5000) {
-    if (this.pollingInterval) {
+    if (this.isPolling) {
       this.stopPolling();
     }
 
-    console.log(`🔄 Starting real-time polling every ${interval}ms`);
-    
+    this.isPolling = true;
     this.pollingInterval = setInterval(async () => {
       try {
-        const systemData = await this.fetchAllSystemData();
-        this.notifyListeners(systemData);
+        const data = await this.fetchAllSystemData();
+        this.notifyListeners(data);
+        this.errorCount = 0;
       } catch (error) {
-        console.error('Polling error:', error);
-        this.notifyListeners({
-          data: null,
-          errors: { polling: error.message },
-          isConnected: false,
-          timestamp: new Date().toISOString()
-        });
+        this.errorCount++;
+        console.error(`Real-time polling error (${this.errorCount}/${this.maxRetries}):`, error);
+        
+        if (this.errorCount >= this.maxRetries) {
+          this.connectionStatus = 'error';
+          this.notifyListeners({
+            isConnected: false,
+            error: error.message,
+            timestamp: new Date().toISOString()
+          });
+        }
       }
     }, interval);
+
+    console.log(`🔄 Real-time polling started (${interval}ms interval)`);
   }
 
   /**
-   * Stop real-time polling
+   * Stop polling
    */
   stopPolling() {
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
       this.pollingInterval = null;
-      console.log('⏹️ Stopped real-time polling');
+    }
+    this.isPolling = false;
+    console.log('⏹️ Real-time polling stopped');
+  }
+
+  /**
+   * Fetch all system data
+   */
+  async fetchAllSystemData() {
+    try {
+      const [
+        health,
+        kpis,
+        zta,
+        quantum,
+        federation,
+        selfEvolution
+      ] = await Promise.all([
+        this.fetchHealth(),
+        this.fetchKPIs(),
+        this.fetchZTA(),
+        this.fetchQuantum(),
+        this.fetchFederation(),
+        this.fetchSelfEvolution()
+      ]);
+
+      const data = {
+        health,
+        kpis,
+        zta,
+        quantum,
+        federation,
+        selfEvolution,
+        isConnected: true,
+        timestamp: new Date().toISOString()
+      };
+
+      this.lastData = data;
+      this.connectionStatus = 'connected';
+      return data;
+    } catch (error) {
+      this.connectionStatus = 'error';
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch system health
+   */
+  async fetchHealth() {
+    const response = await fetch(`${API_BASE_URL}/health`);
+    if (!response.ok) throw new Error(`Health check failed: ${response.status}`);
+    return await response.json();
+  }
+
+  /**
+   * Fetch KPIs
+   */
+  async fetchKPIs() {
+    const response = await fetch(`${API_BASE_URL}/telecom/kpis`);
+    if (!response.ok) throw new Error(`KPIs fetch failed: ${response.status}`);
+    return await response.json();
+  }
+
+  /**
+   * Fetch ZTA status
+   */
+  async fetchZTA() {
+    const response = await fetch(`${API_BASE_URL}/telecom/zta-status`);
+    if (!response.ok) throw new Error(`ZTA fetch failed: ${response.status}`);
+    return await response.json();
+  }
+
+  /**
+   * Fetch quantum security status
+   */
+  async fetchQuantum() {
+    const response = await fetch(`${API_BASE_URL}/telecom/quantum-status`);
+    if (!response.ok) throw new Error(`Quantum status fetch failed: ${response.status}`);
+    return await response.json();
+  }
+
+  /**
+   * Fetch federation data
+   */
+  async fetchFederation() {
+    const response = await fetch(`${API_BASE_URL}/telecom/federation`);
+    if (!response.ok) throw new Error(`Federation fetch failed: ${response.status}`);
+    return await response.json();
+  }
+
+  /**
+   * Fetch self-evolution data
+   */
+  async fetchSelfEvolution() {
+    const response = await fetch(`${API_BASE_URL}/telecom/self-evolution`);
+    if (!response.ok) throw new Error(`Self-evolution fetch failed: ${response.status}`);
+    return await response.json();
+  }
+
+  /**
+   * Test backend connection
+   */
+  async testConnection() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/health`, {
+        method: 'GET',
+        timeout: 5000
+      });
+      this.connectionStatus = response.ok ? 'connected' : 'error';
+      return response.ok;
+    } catch (error) {
+      this.connectionStatus = 'error';
+      return false;
     }
   }
 
@@ -158,36 +202,14 @@ class RealTimeService {
    */
   getConnectionStatus() {
     return {
-      isConnected: this.isConnected,
-      retryCount: this.retryCount,
-      hasListeners: this.listeners.size > 0
+      status: this.connectionStatus,
+      isPolling: this.isPolling,
+      lastData: this.lastData,
+      errorCount: this.errorCount
     };
-  }
-
-  /**
-   * Test backend connectivity
-   */
-  async testConnection() {
-    try {
-      const result = await this.makeRequest(`${API_BASE_URL}/health`);
-      return result.success;
-    } catch (error) {
-      return false;
-    }
   }
 }
 
-// Create singleton instance
-const realTimeService = new RealTimeService();
+// Export singleton instance
+export default new RealTimeService();
 
-// Export service instance and utility functions
-export default realTimeService;
-
-export const {
-  addListener,
-  startPolling,
-  stopPolling,
-  getConnectionStatus,
-  testConnection,
-  fetchAllSystemData
-} = realTimeService;

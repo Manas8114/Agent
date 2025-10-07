@@ -1,325 +1,415 @@
 [
   {
     "id": "TC001",
-    "title": "IBN Create and Enforce Network Intent Successfully",
-    "description": "Verify that a high-level network intent can be created via the IBN API, translated into network policies and successfully enforced without violations.",
+    "title": "High-Level Intent Submission and Enforcement",
+    "description": "Verify the system correctly processes high-level network intents submitted via API or dashboard, translates them into actionable network policies, and enforces them with real-time violation detection.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Call POST /api/v1/telecom/intent with valid high-level intent payload including intent_type, description, priority and constraints"
-      },
-      {
-        "type": "assertion",
-        "description": "API returns status 200 with intent_id, 'status' indicating success and enforcement logs"
+        "description": "Submit a valid high-level network intent using the API."
       },
       {
         "type": "action",
-        "description": "Verify that translated network policies are applied in the system"
+        "description": "Verify that the intent is translated into network policies by the Intent-Based Networking (IBN) module."
+      },
+      {
+        "type": "action",
+        "description": "Monitor the enforcement subsystem for real-time policy application."
       },
       {
         "type": "assertion",
-        "description": "No intent violations occur under defined constraints during monitoring period"
+        "description": "Check that policies are enforced successfully and network behaves accordingly."
+      },
+      {
+        "type": "action",
+        "description": "Simulate a policy violation scenario."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that the system detects and alerts the violation in real-time."
+      },
+      {
+        "type": "action",
+        "description": "Repeat submission of multiple concurrent intents to verify concurrent processing."
+      },
+      {
+        "type": "assertion",
+        "description": "Check all intents are processed correctly without conflicts or errors."
       }
     ]
   },
   {
     "id": "TC002",
-    "title": "IBN Intent Creation with Missing Mandatory Fields",
-    "description": "Verify that creating network intent with missing required fields fails gracefully with proper error messages.",
-    "category": "error handling",
+    "title": "Zero-Touch Automated Deployment with Digital Twin Validation and Rollback",
+    "description": "Verify that Zero-Touch Automation safely deploys new ML models and agents with digital twin validation before production rollout and supports rollback upon failure.",
+    "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Call POST /api/v1/telecom/intent with payload missing 'intent_type' or 'constraints'"
+        "description": "Trigger an automated deployment pipeline for a new ML model update via the ZTA API."
       },
       {
         "type": "assertion",
-        "description": "API returns an error status code indicating validation failure with descriptive error message"
+        "description": "Verify the digital twin environment runs validation tests on the candidate deployment."
+      },
+      {
+        "type": "action",
+        "description": "Allow deployment to proceed if digital twin validation is successful."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the new model/agent is active in the production environment."
+      },
+      {
+        "type": "action",
+        "description": "Inject a fault to simulate deployment failure post-deployment."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that the system performs automatic rollback to previous stable version."
+      },
+      {
+        "type": "action",
+        "description": "Test a deployment where the digital twin validation fails."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure the deployment is aborted and no changes applied to production."
       }
     ]
   },
   {
     "id": "TC003",
-    "title": "Zero-Touch Automation (ZTA) Successful Deployment Pipeline",
-    "description": "Validate that the Zero-Touch Automation pipeline performs secure automated deployment with digital twin validation and rollback on failure.",
-    "category": "functional",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Initiate zero-touch deployment pipeline via appropriate ZTA API endpoint with test AI model update"
-      },
-      {
-        "type": "assertion",
-        "description": "Digital twin validation simulates deployment and indicates no errors"
-      },
-      {
-        "type": "action",
-        "description": "Proceed with deployment and monitor pipeline progress"
-      },
-      {
-        "type": "assertion",
-        "description": "Deployment completes successfully with updates applied"
-      },
-      {
-        "type": "action",
-        "description": "Simulate deployment failure and verify rollback triggers automatically"
-      },
-      {
-        "type": "assertion",
-        "description": "System state is restored to pre-deployment stable state"
-      }
-    ]
-  },
-  {
-    "id": "TC004",
-    "title": "ZTA Status API Returns Correct Deployment Metrics",
-    "description": "Verify /api/v1/telecom/zta-status returns correct status, active pipelines, and deployment metrics reflecting current ZTA system state.",
-    "category": "functional",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Call GET /api/v1/telecom/zta-status"
-      },
-      {
-        "type": "assertion",
-        "description": "Response includes 'status', 'active_pipelines' array and 'deployment_metrics' object with coherent data"
-      }
-    ]
-  },
-  {
-    "id": "TC005",
-    "title": "Quantum-Safe Security Key Generation and Encryption Workflow",
-    "description": "Validate the quantum-safe cryptography processes including key generation, encryption, signing, and verification using CRYSTALS-Kyber and Dilithium algorithms.",
+    "title": "Quantum-Safe Cryptography Operations and Audit Logging",
+    "description": "Validate cryptographic key generation, message signing and verification using CRYSTALS-Kyber and Dilithium algorithms, and validate immutable audit logs with blockchain identity management.",
     "category": "security",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Generate quantum-safe keys with supported algorithms"
-      },
-      {
-        "type": "action",
-        "description": "Encrypt a test message using generated keys"
-      },
-      {
-        "type": "action",
-        "description": "Sign the message and verify the signature"
+        "description": "Generate new public/private keys using Kyber post-quantum algorithm."
       },
       {
         "type": "assertion",
-        "description": "Encryption and signature verification succeed without error"
+        "description": "Confirm keys are generated as per specification with no errors."
+      },
+      {
+        "type": "action",
+        "description": "Sign sample messages using Dilithium signing keys."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the signature correctness and integrity of signed messages."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to verify tampered messages and invalid signatures."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure verification fails for tampered or invalid data."
+      },
+      {
+        "type": "action",
+        "description": "Check audit logs for cryptographic operations."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate immutability of audit logs and verify blockchain-based identity management integrity."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Global Multi-Operator Federation Coordination and Secure Federated Learning",
+    "description": "Test the federation of multiple operators for secure multi-site coordination and encrypted federated learning with privacy preservation.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Register multiple operator nodes to join the global federation using federation APIs."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all nodes are authenticated and registered securely with encryption."
+      },
+      {
+        "type": "action",
+        "description": "Simulate a federated learning round where model updates are shared encrypted."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm encrypted transmission and aggregation of model parameters without leaking raw data."
+      },
+      {
+        "type": "action",
+        "description": "Test failure and recovery scenarios such as node dropouts or communication failure."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate federation controller manages retries, partial updates, and consistency."
+      },
+      {
+        "type": "action",
+        "description": "Simulate cross-operator cooperation scenarios with multiple concurrent tasks."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure tasks are executed securely and results consolidated correctly."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Self-Evolving AI Agents AutoML and NAS Driven Optimization",
+    "description": "Verify the self-evolving AI agents' ability to initiate AutoML-driven optimization tasks and apply neural architecture search and hyperparameter optimization for continuous improvements.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Trigger a self-evolution cycle for a selected AI agent."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm AutoML task is created and neural architecture search begins."
+      },
+      {
+        "type": "action",
+        "description": "Monitor KPIs and performance metrics during the evolution process."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that agent parameters and architecture are updated with improved performance."
+      },
+      {
+        "type": "action",
+        "description": "Simulate failure or suboptimal models in the evolution tasks."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure fallback mechanisms and retries prevent deployment of regressions."
+      },
+      {
+        "type": "action",
+        "description": "Validate continuous KPI tracking and reporting on dashboard."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that evolution progress is correctly visualized in real-time."
       }
     ]
   },
   {
     "id": "TC006",
-    "title": "Quantum-Safe Security API Status Validation",
-    "description": "Check that the /api/v1/telecom/quantum-status endpoint correctly reports security level, algorithms in use, and threat detection statuses.",
-    "category": "functional",
+    "title": "Dashboard Metrics Visualization and Real-Time Monitoring",
+    "description": "Verify that the advanced dashboard correctly visualizes real-time metrics including network intents, automation pipeline status, quantum security status, federation statistics, and self-evolution progress.",
+    "category": "ui",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Call GET /api/v1/telecom/quantum-status"
+        "description": "Access the AI4Dashboard via web interface."
       },
       {
         "type": "assertion",
-        "description": "Response contains 'security_level' string, list of 'algorithms', and 'threat_detection' object"
+        "description": "Confirm all dashboard panels load without errors."
+      },
+      {
+        "type": "action",
+        "description": "Generate live test data for network intents, pipeline automation events, quantum security events, federation metrics, and AI agent evolution."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that real-time updates are reflected visually and match backend telemetry."
+      },
+      {
+        "type": "action",
+        "description": "Simulate metric anomalies or threshold breaches."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify alert indicators and user notifications appear correctly."
+      },
+      {
+        "type": "action",
+        "description": "Test responsiveness and usability on various screen sizes and browsers."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure dashboard maintains performance and functional integrity."
       }
     ]
   },
   {
     "id": "TC007",
-    "title": "Global Multi-Operator Federation Node Join and Model Sharing",
-    "description": "Validate federation joining mechanics where operators join the network, share ML models securely, and participate in cooperative telecom scenarios with accuracy.",
+    "title": "API Endpoint Functionality, Authentication, and Error Handling",
+    "description": "Test all AI4.0 API endpoints related to intent management, zero-touch automation, quantum-safe operations, federation coordination, and self-evolution tasks for correct functionality, authentication, input validation, and robust error handling.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Simulate a new operator node joining the federation network"
-      },
-      {
-        "type": "action",
-        "description": "Share an ML model update encrypted between federation nodes"
+        "description": "Send authenticated requests to all documented API endpoints with valid input data."
       },
       {
         "type": "assertion",
-        "description": "Shared updates are received and aggregated correctly by other nodes"
+        "description": "Verify expected successful responses and data consistency."
       },
       {
         "type": "action",
-        "description": "Simulate a cooperative telecom scenario like traffic spike and verify federation coordinated response"
+        "description": "Send requests with missing or malformed parameters."
       },
       {
         "type": "assertion",
-        "description": "Scenario simulation results align with expected outputs demonstrating cooperation"
+        "description": "Confirm proper validation error responses with clear messages."
+      },
+      {
+        "type": "action",
+        "description": "Attempt access with invalid or expired authentication tokens."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure access is denied and appropriate error codes returned."
+      },
+      {
+        "type": "action",
+        "description": "Simulate backend service failures."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate graceful error handling and informative responses."
       }
     ]
   },
   {
     "id": "TC008",
-    "title": "Global Federation Status API Data Accuracy",
-    "description": "Ensure the /api/v1/telecom/federation endpoint returns accurate statistical data such as total nodes, active nodes, updates shared, aggregations, and model accuracy.",
+    "title": "Deployment Stability and Scalability Under Load",
+    "description": "Validate system stability and scalability in Docker Compose, Kubernetes, and cloud environments with stress/load testing and monitoring for real-time observability and alerting.",
     "category": "functional",
-    "priority": "Medium",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Call GET /api/v1/telecom/federation"
+        "description": "Deploy system using Docker Compose and verify basic functionalities."
       },
       {
         "type": "assertion",
-        "description": "Returned data reflects current state of federation with legitimate numeric values"
+        "description": "Confirm system is stable and responsive under nominal load."
+      },
+      {
+        "type": "action",
+        "description": "Deploy system using Kubernetes with typical configurations and replicas."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify service discovery, scaling, and failover work as expected."
+      },
+      {
+        "type": "action",
+        "description": "Perform load testing simulating high concurrent API calls, federated learning tasks, and dashboard queries."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure no crashes, proper resource utilization, and timely response."
+      },
+      {
+        "type": "action",
+        "description": "Monitor Prometheus metrics and Grafana dashboards during tests."
+      },
+      {
+        "type": "assertion",
+        "description": "Check for triggered alerts or anomalies."
       }
     ]
   },
   {
     "id": "TC009",
-    "title": "Self-Evolving AI Agents Improvement and Tracking",
-    "description": "Test creation and execution of self-evolution tasks on AI agents that utilize AutoML, NAS, and hyperparameter tuning resulting in performance improvements logged via MLflow.",
+    "title": "Comprehensive Integration Tests Covering Intent Management to Self-Evolving Agents",
+    "description": "Run full end-to-end integration tests covering interaction flows from intent submission, automated deployment, quantum-safe cryptography, federation cooperation, self-evolving agent tasks, and observability metrics.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Initiate a self-evolution task on an AI agent through API or internal trigger"
+        "description": "Submit an intent and verify network policy generation and enforcement."
       },
       {
         "type": "action",
-        "description": "Track evolution rounds and monitor architecture and performance improvements"
+        "description": "Automatically deploy an updated AI agent with digital twin validation."
+      },
+      {
+        "type": "action",
+        "description": "Perform cryptographic signing and verification in the workflow."
+      },
+      {
+        "type": "action",
+        "description": "Coordinate a federated learning round across multiple simulated operators."
+      },
+      {
+        "type": "action",
+        "description": "Trigger self-evolution cycles for AI agents and verify performance improvements."
+      },
+      {
+        "type": "action",
+        "description": "Collect and verify metrics ingestion and correct visualization on dashboards."
       },
       {
         "type": "assertion",
-        "description": "Each evolution round shows non-negative improvements in metrics, and MLflow logs are updated accordingly"
+        "description": "Validate successful completion of all stages without errors and consistent state across components."
       }
     ]
   },
   {
     "id": "TC010",
-    "title": "Self-Evolving Agents Status API Verification",
-    "description": "Verify that /api/v1/telecom/self-evolution correctly reports agent evolution status, including evolution rounds, architecture and performance improvement values.",
-    "category": "functional",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Call GET /api/v1/telecom/self-evolution for existing agents"
-      },
-      {
-        "type": "assertion",
-        "description": "Response contains agent_id, evolution_round, architecture_improvement, performance_improvement, and evolution_status"
-      }
-    ]
-  },
-  {
-    "id": "TC011",
-    "title": "Real-time Dashboard Displays Live Data and Alerts",
-    "description": "Verify that the real-time dashboard is populated with live updating data through WebSocket connections and accurately shows health metrics, AI statuses, and generates alerts.",
-    "category": "ui",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Open real-time dashboard UI and connect to backend via WebSocket"
-      },
-      {
-        "type": "assertion",
-        "description": "Live data updates are received and displayed correctly for all AI 4.0 components"
-      },
-      {
-        "type": "assertion",
-        "description": "Alerts trigger on threshold breaches and disappear when conditions normalize"
-      }
-    ]
-  },
-  {
-    "id": "TC012",
-    "title": "Real-time Data API Provides Consistent System Data",
-    "description": "Test that GET /api/v1/real-data returns comprehensive, up-to-date and correctly structured system data across health, KPIs, federation, and self-evolution modules.",
-    "category": "functional",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Call GET /api/v1/real-data"
-      },
-      {
-        "type": "assertion",
-        "description": "Response contains expected properties with plausible real-time values for all monitored components"
-      }
-    ]
-  },
-  {
-    "id": "TC013",
-    "title": "Monitoring API Health Endpoint Returns System Status",
-    "description": "Verify /api/v1/health endpoint provides an accurate summary of system health including component statuses and timestamps.",
-    "category": "functional",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Call GET /api/v1/health"
-      },
-      {
-        "type": "assertion",
-        "description": "Response contains 'status', 'timestamp', 'version', and detailed 'components' status"
-      }
-    ]
-  },
-  {
-    "id": "TC014",
-    "title": "Monitoring API Metrics Endpoint Provides System Metrics",
-    "description": "Ensure GET /api/v1/metrics returns up-to-date system performance metrics such as CPU usage, memory usage, network latency, and AI model accuracy.",
-    "category": "functional",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Call GET /api/v1/metrics"
-      },
-      {
-        "type": "assertion",
-        "description": "Returned metrics are present and values fall within expected operational ranges"
-      }
-    ]
-  },
-  {
-    "id": "TC015",
-    "title": "Data Management API Ingests Real-time Data Successfully",
-    "description": "Validate that POST /api/v1/data/ingest accepts various data types with valid data payloads including timestamp, and ingests data into the system properly.",
-    "category": "functional",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Send POST request to /api/v1/data/ingest with valid data_type, data object and ISO timestamp"
-      },
-      {
-        "type": "assertion",
-        "description": "API responds with success status and data is processed and stored without errors"
-      }
-    ]
-  },
-  {
-    "id": "TC016",
-    "title": "Data Management API Handles Invalid Data Input Gracefully",
-    "description": "Test that the data ingestion API returns appropriate errors when provided with invalid payloads such as missing data_type or malformed timestamp.",
+    "title": "Error Handling and Edge Case Validation Across Modules",
+    "description": "Validate robust error handling and correct behavior in edge cases and failure scenarios including invalid inputs, network interruptions, partial federation participation, corrupted models, and expired cryptographic keys.",
     "category": "error handling",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Send POST request to /api/v1/data/ingest with invalid or incomplete fields"
+        "description": "Submit malformed intents with invalid fields."
       },
       {
         "type": "assertion",
-        "description": "API returns clear validation error messages and does not process invalid data"
+        "description": "Check for descriptive validation errors and no system crashes."
+      },
+      {
+        "type": "action",
+        "description": "Disconnect network during automated deployment validation phases."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure rollback procedures are triggered and safe state restored."
+      },
+      {
+        "type": "action",
+        "description": "Simulate a federation where some operators drop out mid-learning."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify partial aggregation and graceful failure handling."
+      },
+      {
+        "type": "action",
+        "description": "Attempt cryptographic operations with expired or revoked keys."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate rejection of invalid keys and secure error notifications."
+      },
+      {
+        "type": "action",
+        "description": "Deploy corrupted or suboptimal ML models through self-evolution."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm fallback to last stable model and clear logging."
       }
     ]
   }

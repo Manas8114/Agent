@@ -14,7 +14,7 @@ import asyncio
 # Import AI 4.0 components
 from core.ibn_controller import IBNController, IntentType
 from core.zero_touch import ZTAController, UpdateType
-from core.quantum_safe_security import QuantumSafeSecurityManager, PQAlgorithm, SecurityLevel
+from core.real_quantum_crypto import RealQuantumSafeCrypto
 from core.global_federation import GlobalFederationManager, FederationRole
 from agents.self_evolving_agents import SelfEvolvingAgentManager, EvolutionType
 from monitoring.ai4_metrics import AI4MetricsCollector
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # Initialize AI 4.0 components
 ibn_controller = IBNController()
 zta_controller = ZTAController()
-qs_security = QuantumSafeSecurityManager()
+qs_security = RealQuantumSafeCrypto()
 federation_manager = GlobalFederationManager()
 evolution_manager = SelfEvolvingAgentManager()
 metrics_collector = AI4MetricsCollector()
@@ -33,7 +33,7 @@ metrics_collector = AI4MetricsCollector()
 # Start all services
 ibn_controller.start_ibn_mode()
 zta_controller.start_zta_mode()
-qs_security.start_security_monitoring()
+# qs_security.start_security_monitoring()  # Method not available in RealQuantumSafeCrypto
 federation_manager.start_federation_mode()
 evolution_manager.start_evolution_mode()
 metrics_collector.start_metrics_collection()

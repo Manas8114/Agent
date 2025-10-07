@@ -13,15 +13,6 @@ import {
   Activity
 } from 'lucide-react';
 
-// Services
-import { 
-  fetchRealTimeData, 
-  simulateGamingMetrics, 
-  simulateStreamingMetrics,
-  calculateAIImprovements,
-  generateBeforeAIMetrics
-} from '../../services/userExperienceService';
-
 const UserExperiencePanel = ({ data, onRefresh }) => {
   const [gamingMetrics, setGamingMetrics] = useState({
     fps: 60,
@@ -61,42 +52,43 @@ const UserExperiencePanel = ({ data, onRefresh }) => {
     lastOptimization: new Date()
   });
 
-  const [realTimeData, setRealTimeData] = useState(null);
-
   // Simulate real-time data updates
   const updateMetrics = useCallback(async () => {
     try {
-      // Try to fetch real data first
-      const realData = await fetchRealTimeData();
-      
-      // Generate new metrics using the service
-      const newGamingMetrics = simulateGamingMetrics(realData);
-      const newStreamingMetrics = simulateStreamingMetrics(realData);
-      
-      // Update gaming metrics
-      setGamingMetrics(prev => ({
-        ...prev,
-        ...newGamingMetrics,
-        serverIP: newGamingMetrics.serverIP.ip,
-        serverName: newGamingMetrics.serverName
-      }));
+      // Generate new metrics with realistic variations
+      const newGamingMetrics = {
+        fps: Math.max(30, Math.min(144, gamingMetrics.fps + (Math.random() - 0.5) * 20)),
+        ping: Math.max(20, Math.min(200, gamingMetrics.ping + (Math.random() - 0.5) * 15)),
+        jitter: Math.max(0.5, Math.min(15, gamingMetrics.jitter + (Math.random() - 0.5) * 1.5)),
+        packetLoss: Math.max(0, Math.min(5, gamingMetrics.packetLoss + (Math.random() - 0.5) * 0.3)),
+        serverIP: gamingMetrics.serverIP,
+        serverName: gamingMetrics.serverName,
+        isConnected: true,
+        beforeAI: gamingMetrics.beforeAI
+      };
 
-      // Update streaming metrics
-      setYoutubeMetrics(prev => ({
-        ...prev,
-        ...newStreamingMetrics
-      }));
+      const newStreamingMetrics = {
+        buffering: Math.max(0, Math.min(20, youtubeMetrics.buffering + (Math.random() - 0.5) * 2)),
+        resolution: youtubeMetrics.resolution,
+        startupDelay: Math.max(0.5, Math.min(10, youtubeMetrics.startupDelay + (Math.random() - 0.5) * 0.5)),
+        smoothness: Math.max(70, Math.min(100, youtubeMetrics.smoothness + (Math.random() - 0.5) * 5)),
+        isPlaying: youtubeMetrics.isPlaying,
+        beforeAI: youtubeMetrics.beforeAI
+      };
+
+      setGamingMetrics(newGamingMetrics);
+      setYoutubeMetrics(newStreamingMetrics);
 
       // Calculate AI improvements
-      const improvements = calculateAIImprovements(
-        { fps: newGamingMetrics.fps, ping: newGamingMetrics.ping, buffering: newStreamingMetrics.buffering },
-        { fps: gamingMetrics.beforeAI.fps, ping: gamingMetrics.beforeAI.ping, buffering: youtubeMetrics.beforeAI.buffering }
-      );
+      const fpsImprovement = ((newGamingMetrics.fps - newGamingMetrics.beforeAI.fps) / newGamingMetrics.beforeAI.fps * 100);
+      const pingImprovement = ((newGamingMetrics.beforeAI.ping - newGamingMetrics.ping) / newGamingMetrics.beforeAI.ping * 100);
+      const bufferingImprovement = ((newStreamingMetrics.beforeAI.buffering - newStreamingMetrics.buffering) / newStreamingMetrics.beforeAI.buffering * 100);
+      
+      const overallImprovement = (fpsImprovement + pingImprovement + bufferingImprovement) / 3;
 
-      // Update AI allocation
       setAiAllocation(prev => ({
         ...prev,
-        improvement: improvements.overallImprovement / 100,
+        improvement: overallImprovement / 100,
         serverLoad: Math.max(0.3, Math.min(0.9, prev.serverLoad + (Math.random() - 0.5) * 0.05)),
         networkOptimization: Math.max(0.7, Math.min(1.0, prev.networkOptimization + (Math.random() - 0.3) * 0.05)),
         lastOptimization: new Date()
@@ -104,54 +96,13 @@ const UserExperiencePanel = ({ data, onRefresh }) => {
     } catch (error) {
       console.warn('Failed to update metrics:', error);
     }
-  }, [gamingMetrics.beforeAI, youtubeMetrics.beforeAI]);
-
-  // Fetch real data if available
-  const fetchRealData = useCallback(async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/v1/real-data');
-      if (response.ok) {
-        const realData = await response.json();
-        setRealTimeData(realData);
-        
-        // Use real data to influence simulation
-        if (realData.kpis) {
-          setGamingMetrics(prev => ({
-            ...prev,
-            ping: realData.kpis.latency_ms || prev.ping,
-            jitter: realData.kpis.jitter_ms || prev.jitter,
-            packetLoss: realData.kpis.packet_loss_rate * 100 || prev.packetLoss
-          }));
-        }
-      }
-    } catch (error) {
-      console.log('Real data not available, using simulation');
-    }
-  }, []);
+  }, [gamingMetrics, youtubeMetrics]);
 
   // Auto-refresh every 2 seconds
   useEffect(() => {
     const interval = setInterval(updateMetrics, 2000);
     return () => clearInterval(interval);
   }, [updateMetrics]);
-
-  // Initialize before AI metrics
-  useEffect(() => {
-    const beforeAIMetrics = generateBeforeAIMetrics();
-    setGamingMetrics(prev => ({
-      ...prev,
-      beforeAI: beforeAIMetrics.gaming
-    }));
-    setYoutubeMetrics(prev => ({
-      ...prev,
-      beforeAI: beforeAIMetrics.streaming
-    }));
-  }, []);
-
-  // Fetch real data on mount
-  useEffect(() => {
-    fetchRealData();
-  }, [fetchRealData]);
 
   const getFPSColor = (fps) => {
     if (fps >= 60) return 'text-green-500';
@@ -186,7 +137,7 @@ const UserExperiencePanel = ({ data, onRefresh }) => {
   const bufferingImprovement = ((youtubeMetrics.beforeAI.buffering - youtubeMetrics.buffering) / youtubeMetrics.beforeAI.buffering * 100).toFixed(1);
 
   return (
-    <div className="dashboard-panel-full dark:bg-gray-800">
+    <div id="user-experience" className="dashboard-panel-full dark:bg-gray-800">
       <div className="px-4 lg:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
